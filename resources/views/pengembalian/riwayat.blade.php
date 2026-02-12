@@ -3,10 +3,11 @@
 @section('title', 'Riwayat Pengembalian - Perpustakaan Digital')
 
 @section('content')
-<div class="container py-4">
-    <h1 class="fw-bold mb-4">
-        <i class="fas fa-undo text-primary me-2"></i>Riwayat Pengembalian
-    </h1>
+<section class="member-page member-main-block">
+    <div class="member-page-header">
+        <h1><i class="fas fa-undo me-2"></i>Riwayat Pengembalian</h1>
+        <p>Lihat status proses pengembalian buku Anda.</p>
+    </div>
 
     @if(session('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -20,11 +21,7 @@
             {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-        <script>
-            setTimeout(function() {
-                window.location.href = '/pengembalian/riwayat?t=' + new Date().getTime();
-            }, 1000);
-        </script>
+        <div data-auto-redirect-url="/pengembalian/riwayat?t={{ now()->timestamp }}" data-auto-redirect-delay="1000"></div>
     @endif
 
     @if(!session('anggota_id'))
@@ -32,90 +29,80 @@
             Silakan <a href="{{ route('login') }}">login</a> terlebih dahulu.
         </div>
     @else
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
+        <div class="card member-section-card">
+            <div class="card-header">
                 <h5 class="mb-0">
                     <i class="fas fa-list me-2"></i>Daftar Riwayat Pengembalian
                 </h5>
             </div>
             <div class="card-body">
                 @if($riwayat->count() > 0)
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th style="width: 50px">No</th>
-                                    <th style="120px">Tgl Pengajuan</th>
-                                    <th>Buku</th>
-                                    <th style="110px">Status</th>
-                                    <th style="130px">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($riwayat as $index => $pengembalian)
-                                    <tr>
-                                        <td class="text-center">{{ $riwayat->firstItem() + $index }}</td>
-                                        <td>
-                                            <small>
-                                                <i class="fas fa-calendar-plus me-1 text-primary"></i>
-                                                {{ $pengembalian->tanggal_pengajuan->format('d/m/Y') }}
-                                            </small>
-                                        </td>
-                                        <td>
+                    <div class="member-stack">
+                        @foreach($riwayat as $pengembalian)
+                            <article class="member-record-card">
+                                <div class="member-record-head">
+                                    <div>
+                                        <div class="fw-bold">#{{ str_pad($pengembalian->id, 5, '0', STR_PAD_LEFT) }}</div>
+                                        <div class="member-record-meta">
+                                            <i class="fas fa-calendar-plus me-1"></i>{{ $pengembalian->tanggal_pengajuan->format('d/m/Y') }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        @if($pengembalian->status == 'pending_admin')
+                                            <span class="badge bg-info member-status-badge">Menunggu</span>
+                                        @elseif($pengembalian->status == 'ditolak')
+                                            <span class="badge bg-danger member-status-badge">Ditolak</span>
+                                        @else
+                                            <span class="badge bg-success member-status-badge">Selesai</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-lg-8">
+                                        <div class="member-book-list">
                                             @foreach($pengembalian->peminjaman->detailPeminjamans as $detail)
-                                                <div class="d-flex align-items-center mb-2">
+                                                <div class="member-book-item">
                                                     @if($detail->buku->cover && file_exists(public_path('storage/covers/' . $detail->buku->cover)))
-                                                        <img src="{{ asset('storage/covers/' . $detail->buku->cover) }}" 
-                                                             alt="{{ $detail->buku->judul }}" 
-                                                             class="img-thumbnail me-2"
-                                                             style="width: 35px; height: 47px; object-fit: cover;">
+                                                        <img src="{{ asset('storage/covers/' . $detail->buku->cover) }}" alt="{{ $detail->buku->judul }}" class="member-book-cover">
                                                     @else
-                                                        <div class="bg-secondary text-white me-2 d-flex align-items-center justify-content-center" 
-                                                             style="width: 35px; height: 47px; font-size: 14px;">
+                                                        <div class="member-book-fallback bg-secondary text-white d-flex align-items-center justify-content-center">
                                                             <i class="fas fa-book"></i>
                                                         </div>
                                                     @endif
                                                     <div>
-                                                        <small><strong>{{ $detail->buku->judul }}</strong></small>
-                                                        <br><small class="text-primary">Qty: {{ $detail->jumlah }}</small>
+                                                        <div class="fw-semibold">{{ $detail->buku->judul }}</div>
+                                                        <small class="text-primary">Qty: {{ $detail->jumlah }}</small>
                                                     </div>
                                                 </div>
                                             @endforeach
-                                        </td>
-                                        <td>
-                                            @if($pengembalian->status == 'pending_admin')
-                                                <span class="badge bg-info">Menunggu</span>
-                                            @elseif($pengembalian->status == 'ditolak')
-                                                <span class="badge bg-danger">Ditolak</span>
-                                            @else
-                                                <span class="badge bg-success">Selesai</span>
-                                            @endif
-                                        </td>
-                                        <td>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="d-grid gap-2">
                                             @if($pengembalian->status == 'pending_admin')
                                                 <span class="text-muted small">Menunggu...</span>
                                             @elseif($pengembalian->status == 'ditolak')
                                                 <a href="{{ route('pengembalian.ajukan-ulang', $pengembalian->id) }}" 
-                                                   class="btn btn-sm btn-primary w-100"
+                                                   class="btn btn-sm btn-primary member-action-button"
                                                    onclick="return confirm('Ajukan pengembalian ulang?')">
                                                     <i class="fas fa-redo me-1"></i>Ajukan Lagi
                                                 </a>
                                             @else
                                                 <span class="text-muted small">-</span>
                                             @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        @endforeach
                     </div>
                     
                     <div class="d-flex justify-content-center mt-3">
                         {{ $riwayat->links() }}
                     </div>
                 @else
-                    <div class="text-center py-5">
-                        <i class="fas fa-undo fa-4x text-muted mb-3"></i>
+                    <div class="member-empty-state">
+                        <i class="fas fa-undo"></i>
                         <h5>Belum ada riwayat pengembalian</h5>
                         <p class="text-muted">Riwayat pengembalian akan muncul di sini.</p>
                     </div>
@@ -123,5 +110,5 @@
             </div>
         </div>
     @endif
-</div>
+</section>
 @endsection

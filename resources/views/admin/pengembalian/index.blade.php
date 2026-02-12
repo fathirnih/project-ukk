@@ -7,14 +7,48 @@
 @endsection
 
 @section('content')
-<div class="mb-3">
-    <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left me-1"></i> Kembali
-    </a>
+<div class="admin-page-intro">
+    <h6><i class="fas fa-clipboard-check me-2"></i>Workflow Pengembalian</h6>
+    <p>Validasi pengembalian buku anggota dan pastikan stok kembali ter-update dengan benar.</p>
 </div>
 
-<div class="card shadow-sm">
-    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+<div class="admin-index-overview mb-4">
+    <div class="admin-mini-stat">
+        <span>Menunggu</span>
+        <strong>{{ $statPending }}</strong>
+    </div>
+    <div class="admin-mini-stat">
+        <span>Ditolak</span>
+        <strong>{{ $statDitolak }}</strong>
+    </div>
+    <div class="admin-mini-stat">
+        <span>Selesai</span>
+        <strong>{{ $statSelesai }}</strong>
+    </div>
+</div>
+
+<div class="admin-content-grid mb-4">
+    <div class="admin-spotlight-card">
+        <h6><i class="fas fa-triangle-exclamation me-2"></i>Perhatian</h6>
+        <div class="admin-spotlight-list">
+            <div class="admin-spotlight-item"><span>Menunggu verifikasi</span><small>{{ $statPending }}</small></div>
+            <div class="admin-spotlight-item"><span>Pengembalian ditolak</span><small>{{ $statDitolak }}</small></div>
+        </div>
+    </div>
+    <div class="admin-spotlight-card">
+        <h6><i class="fas fa-link me-2"></i>Pintasan</h6>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary admin-action-btn">
+                <i class="fas fa-arrow-left me-1"></i>Kembali
+            </a>
+            <a href="{{ route('admin.pengembalian.index', ['status' => 'pending']) }}" class="btn btn-outline-primary admin-action-btn">Menunggu</a>
+            <a href="{{ route('admin.pengembalian.index', ['status' => 'selesai']) }}" class="btn btn-outline-primary admin-action-btn">Selesai</a>
+        </div>
+    </div>
+</div>
+
+<div class="card admin-card">
+    <div class="card-header admin-card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fas fa-list me-2"></i>Daftar Pengembalian</h5>
         <div>
             <a href="{{ route('admin.pengembalian.index', ['status' => 'pending']) }}" class="btn btn-sm btn-light {{ $status == 'pending' ? 'bg-white text-primary' : '' }}">
@@ -31,8 +65,8 @@
     <div class="card-body">
         @if($pengembalian->count() > 0)
             <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-dark">
+                <table class="table table-bordered table-hover admin-table">
+                    <thead>
                         <tr>
                             <th style="width: 50px">No</th>
                             <th style="width: 100px">Kode</th>
@@ -59,7 +93,7 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ route('admin.pengembalian.show', $item->id) }}" class="btn btn-sm btn-primary">
+                                    <a href="{{ route('admin.pengembalian.show', $item->id) }}" class="btn btn-sm btn-primary admin-icon-btn">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                 </td>

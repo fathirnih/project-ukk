@@ -4,24 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Perpustakaan Digital')</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        main {
-            flex: 1;
-        }
-        footer {
-            margin-top: auto;
-        }
-    </style>
+    @vite(['resources/css/site-theme.css', 'resources/js/app.js'])
 </head>
-<body>
+<body class="app-layout">
     <!-- Navbar Component -->
     @include('components.navbar')
 
@@ -31,31 +16,45 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white py-4 mt-4">
+    <footer class="app-footer mt-4">
         <div class="container">
-            <div class="row">
-                <div class="col-md-6 mb-3 mb-md-0">
-                    <h5 class="fw-bold">
-                        <i class="fas fa-book-open me-2"></i>Perpustakaan Digital
-                    </h5>
-                    <p class="mb-0 text-muted">Menyediakan akses mudah dan cepat ke berbagai koleksi buku dari seluruh dunia.</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <h5>Tautan Cepat</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="{{ route('home') }}" class="text-white text-decoration-none">Home</a></li>
-                        <li><a href="{{ route('koleksi') }}" class="text-white text-decoration-none">Koleksi Buku</a></li>
-                        <li><a href="{{ route('tentang') }}" class="text-white text-decoration-none">Tentang Kami</a></li>
-                    </ul>
+            <div class="app-footer-top">
+                <div class="row g-4">
+                    <div class="col-lg-5">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-book-open me-2"></i>Perpustakaan Digital
+                        </h5>
+                        <p class="app-footer-text mb-3">Menyediakan akses mudah dan cepat ke koleksi buku berkualitas untuk mendukung budaya literasi.</p>
+                        <div class="app-footer-social">
+                            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <h6 class="app-footer-title">Navigasi</h6>
+                        <ul class="app-footer-links list-unstyled mb-0">
+                            <li><a href="{{ route('home') }}">Home</a></li>
+                            <li><a href="{{ route('koleksi') }}">Koleksi</a></li>
+                            <li><a href="{{ route('tentang') }}">Tentang</a></li>
+                            <li><a href="{{ route('kontak') }}">Kontak</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <h6 class="app-footer-title">Kontak</h6>
+                        <ul class="app-footer-meta list-unstyled mb-0">
+                            <li><i class="fas fa-envelope me-2"></i>info@perpustakaan-digital.com</li>
+                            <li><i class="fas fa-phone me-2"></i>(021) 123-4567</li>
+                            <li><i class="fas fa-location-dot me-2"></i>Jakarta Pusat</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-            <hr class="my-3 border-secondary">
-            <p class="text-center mb-0">
-                &copy; {{ date('Y') }} Perpustakaan Digital. All rights reserved.
-            </p>
+            <div class="app-footer-bottom d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+                <small>&copy; {{ date('Y') }} Perpustakaan Digital</small>
+                <small>Built for better reading experience</small>
+            </div>
         </div>
     </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

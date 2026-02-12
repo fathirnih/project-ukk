@@ -4,55 +4,60 @@
 @section('header', 'Edit Buku')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <a href="{{ route('admin.buku.index') }}" class="btn btn-secondary">
+<div class="d-flex justify-content-between align-items-center admin-section-actions">
+    <a href="{{ route('admin.buku.index') }}" class="btn btn-secondary admin-action-btn">
         <i class="fas fa-arrow-left me-2"></i>Kembali
     </a>
 </div>
 
-<div class="card shadow-sm">
-    <div class="card-header bg-warning text-dark">
+<div class="admin-page-intro">
+    <h6><i class="fas fa-pen-to-square me-2"></i>Edit Buku</h6>
+    <p>Perbarui metadata buku, jumlah stok, atau cover agar data koleksi tetap akurat.</p>
+</div>
+
+<div class="card admin-card">
+    <div class="card-header admin-card-header">
         <h5 class="mb-0">
             <i class="fas fa-edit me-2"></i>Form Edit Buku
         </h5>
     </div>
-    <div class="card-body">
+    <div class="card-body admin-form-shell">
         <form action="{{ route('admin.buku.update', $buku->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
-            <div class="row">
-                <div class="col-md-8">
+            <div class="row g-4">
+                <div class="col-lg-8">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="judul" class="form-label fw-bold">Judul Buku <span class="text-danger">*</span></label>
+                            <label for="judul" class="form-label admin-form-label">Judul Buku <span class="text-danger">*</span></label>
                             <input type="text" class="form-control @error('judul') is-invalid @enderror" id="judul" name="judul" value="{{ old('judul', $buku->judul) }}" required>
                             @error('judul')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="isbn" class="form-label fw-bold">ISBN</label>
+                            <label for="isbn" class="form-label admin-form-label">ISBN</label>
                             <input type="text" class="form-control" id="isbn" name="isbn" value="{{ old('isbn', $buku->isbn) }}">
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="pengarang" class="form-label fw-bold">Pengarang <span class="text-danger">*</span></label>
+                            <label for="pengarang" class="form-label admin-form-label">Pengarang <span class="text-danger">*</span></label>
                             <input type="text" class="form-control @error('pengarang') is-invalid @enderror" id="pengarang" name="pengarang" value="{{ old('pengarang', $buku->pengarang) }}" required>
                             @error('pengarang')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="penerbit" class="form-label fw-bold">Penerbit</label>
+                            <label for="penerbit" class="form-label admin-form-label">Penerbit</label>
                             <input type="text" class="form-control" id="penerbit" name="penerbit" value="{{ old('penerbit', $buku->penerbit) }}">
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-4 mb-3">
-                            <label for="kategori_id" class="form-label fw-bold">Kategori</label>
+                            <label for="kategori_id" class="form-label admin-form-label">Kategori</label>
                             <select class="form-select" id="kategori_id" name="kategori_id">
                                 <option value="">-- Pilih Kategori --</option>
                                 @foreach(\App\Models\Kategori::all() as $kat)
@@ -63,41 +68,49 @@
                             </select>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label for="tahun_terbit" class="form-label fw-bold">Tahun Terbit</label>
+                            <label for="tahun_terbit" class="form-label admin-form-label">Tahun Terbit</label>
                             <input type="number" class="form-control" id="tahun_terbit" name="tahun_terbit" value="{{ old('tahun_terbit', $buku->tahun_terbit) }}" placeholder="2024">
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label for="jumlah" class="form-label fw-bold">Jumlah</label>
+                            <label for="jumlah" class="form-label admin-form-label">Jumlah</label>
                             <input type="number" class="form-control" id="jumlah" name="jumlah" value="{{ old('jumlah', $buku->jumlah) }}">
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="deskripsi" class="form-label fw-bold">Deskripsi</label>
+                        <label for="deskripsi" class="form-label admin-form-label">Deskripsi</label>
                         <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3">{{ old('deskripsi', $buku->deskripsi) }}</textarea>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-lg-4">
                     <div class="mb-3">
-                        <label for="cover" class="form-label fw-bold">Cover Buku</label>
+                        <label for="cover" class="form-label admin-form-label">Cover Buku</label>
                         <input type="file" class="form-control" id="cover" name="cover" accept="image/*">
                         <small class="text-muted">Format: JPG, PNG, GIF. Maksimal 2MB</small>
                     </div>
                     @if($buku->cover && file_exists(public_path('covers/' . $buku->cover)))
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Cover Saat Ini:</label>
+                            <label class="form-label admin-form-label">Cover Saat Ini:</label>
                             <br>
                             <img src="{{ asset('covers/' . $buku->cover) }}" alt="{{ $buku->judul }}" class="img-thumbnail" style="max-width: 150px;">
                         </div>
                     @endif
+                    <div class="admin-side-card">
+                        <h6><i class="fas fa-chart-line me-2"></i>Ringkasan</h6>
+                        <ul class="admin-side-list">
+                            <li>Kategori: {{ $buku->kategori?->nama ?? 'Belum dipilih' }}</li>
+                            <li>Stok saat ini: {{ $buku->jumlah }}</li>
+                            <li>Tahun terbit: {{ $buku->tahun_terbit ?? '-' }}</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
-            <div class="d-grid gap-2 d-md-flex">
-                <button type="submit" class="btn btn-warning">
+            <div class="d-grid gap-2 d-md-flex admin-form-actions">
+                <button type="submit" class="btn btn-warning admin-action-btn">
                     <i class="fas fa-save me-2"></i>Perbarui Buku
                 </button>
-                <a href="{{ route('admin.buku.index') }}" class="btn btn-secondary">
+                <a href="{{ route('admin.buku.index') }}" class="btn btn-secondary admin-action-btn">
                     <i class="fas fa-times me-2"></i>Batal
                 </a>
             </div>

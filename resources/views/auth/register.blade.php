@@ -4,33 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar - Perpustakaan Digital</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-        }
-        .register-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            max-width: 450px;
-            width: 100%;
-        }
-    </style>
+    @vite(['resources/css/site-theme.css', 'resources/js/app.js'])
 </head>
-<body>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-5">
-                <div class="register-card p-4 mx-auto">
+<body class="auth-layout">
+    <div class="container auth-shell">
+        <div class="row g-0 auth-frame overflow-hidden">
+            <div class="col-lg-5 d-none d-lg-flex auth-brand-panel">
+                <div>
+                    <span class="auth-pill mb-3 d-inline-flex">Registrasi Anggota</span>
+                    <h2 class="fw-bold mb-3">Gabung Perpustakaan Digital</h2>
+                    <p class="mb-4 opacity-75">Buat akun anggota untuk menikmati pengalaman peminjaman buku yang cepat dan terorganisir.</p>
+                    <div class="auth-brand-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7 auth-form-panel">
+                <div class="auth-form-card p-4 p-md-5 mx-auto">
                     <div class="text-center mb-4">
                         <i class="fas fa-user-plus fa-3x text-success mb-3"></i>
-                        <h4 class="fw-bold">Daftar Anggota Baru</h4>
-                        <p class="text-muted">Perpustakaan Digital</p>
+                        <h4 class="fw-bold mb-1">Daftar Anggota Baru</h4>
+                        <p class="text-muted mb-0">Perpustakaan Digital</p>
                     </div>
 
                     @if(session('success'))
@@ -62,11 +56,11 @@
                             <i class="fas fa-user-plus me-2"></i>Daftar
                         </button>
                     </form>
-                    <hr>
-                    <p class="text-center mb-0">
-                        Sudah punya akun? 
-                        <a href="{{ route('login') }}">Login here</a>
-                    </p>
+
+                    <div class="text-center small">
+                        Sudah punya akun?
+                        <a href="{{ route('login') }}" class="fw-semibold text-decoration-none">Login di sini</a>
+                    </div>
                     <hr>
                     <p class="text-center mb-0">
                         <a href="{{ route('home') }}" class="text-muted text-decoration-none">
@@ -77,6 +71,5 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -16,6 +16,7 @@ class BukuSeeder extends Seeder
                 'isbn' => '978-979-1224-07-0',
                 'pengarang' => 'Andrea Hirata',
                 'penerbit' => 'Bentang Pustaka',
+                'cover' => 'laskar-pelangi.svg',
                 'deskripsi' => 'Kisah inspiratif tentang sepuluh anak di sebuah sekolah terpencil di Belitung yang bermimpi menjadi sarjana.',
                 'tahun_terbit' => 2005,
                 'kategori_id' => 1,
@@ -26,6 +27,7 @@ class BukuSeeder extends Seeder
                 'isbn' => '978-979-22-3789-8',
                 'pengarang' => 'Ahmad Fuadi',
                 'penerbit' => 'Gramedia Pustaka Utama',
+                'cover' => 'sang-penulis.svg',
                 'deskripsi' => 'Novel tentang Raka, seorang penulis muda yang berjuang di dunia sastra Indonesia.',
                 'tahun_terbit' => 2009,
                 'kategori_id' => 1,
@@ -36,6 +38,7 @@ class BukuSeeder extends Seeder
                 'isbn' => '978-602-03-0032-8',
                 'pengarang' => 'Pidi Baiq',
                 'penerbit' => 'GagasMedia',
+                'cover' => 'dilan-1990.svg',
                 'deskripsi' => 'Kisah romansa antara Dilan dan Milea yang berlangsung di Bandung tahun 1990.',
                 'tahun_terbit' => 2014,
                 'kategori_id' => 2,
@@ -46,6 +49,7 @@ class BukuSeeder extends Seeder
                 'isbn' => '978-979-25-5922-0',
                 'pengarang' => 'Tere Liye',
                 'penerbit' => 'Republika',
+                'cover' => 'rindu.svg',
                 'deskripsi' => 'Novel yang menceritakan perjalanan hidup dan perjuangan seorang perempuan bernama Rindu.',
                 'tahun_terbit' => 2014,
                 'kategori_id' => 1,
@@ -56,6 +60,7 @@ class BukuSeeder extends Seeder
                 'isbn' => '978-602-22-0083-8',
                 'pengarang' => 'Tere Liye',
                 'penerbit' => 'Gramedia Pustaka Utama',
+                'cover' => 'bumi.svg',
                 'deskripsi' => 'Petualangan Ra, Kiba, dan teman-teman mereka dalam menyelamatkan Bumi dari ancaman alien.',
                 'tahun_terbit' => 2014,
                 'kategori_id' => 3,
@@ -66,6 +71,7 @@ class BukuSeeder extends Seeder
                 'isbn' => '978-979-22-4482-0',
                 'pengarang' => 'Ahmad Fuadi',
                 'penerbit' => 'Gramedia Pustaka Utama',
+                'cover' => 'negeri-5-menara.svg',
                 'deskripsi' => 'Kisah persahabatan enam mahasiswa dari berbagai daerah di Indonesia.',
                 'tahun_terbit' => 2009,
                 'kategori_id' => 1,
@@ -74,7 +80,10 @@ class BukuSeeder extends Seeder
         ];
 
         foreach ($buku as $item) {
-            Buku::create($item);
+            Buku::updateOrCreate(
+                ['isbn' => $item['isbn']],
+                $item
+            );
         }
     }
 }

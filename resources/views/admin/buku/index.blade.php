@@ -4,22 +4,61 @@
 @section('header', 'Kelola Buku')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <a href="{{ route('admin.buku.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>Tambah Buku
-    </a>
+<div class="admin-page-intro">
+    <h6><i class="fas fa-layer-group me-2"></i>Manajemen Koleksi Buku</h6>
+    <p>Kelola data buku, cek stok menipis, dan pastikan koleksi memiliki cover yang layak tampil.</p>
 </div>
 
-<div class="card shadow-sm">
-    <div class="card-header bg-primary text-white">
+<div class="admin-index-overview mb-4">
+    <div class="admin-mini-stat">
+        <span>Total Buku</span>
+        <strong>{{ $totalBuku }}</strong>
+    </div>
+    <div class="admin-mini-stat">
+        <span>Stok Menipis</span>
+        <strong>{{ $stokMenipis }}</strong>
+    </div>
+    <div class="admin-mini-stat">
+        <span>Tanpa Cover</span>
+        <strong>{{ $tanpaCover }}</strong>
+    </div>
+</div>
+
+<div class="admin-content-grid mb-4">
+    <div class="admin-spotlight-card">
+        <h6><i class="fas fa-bolt me-2"></i>Aksi Cepat</h6>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ route('admin.buku.create') }}" class="btn btn-primary admin-action-btn">
+                <i class="fas fa-plus me-2"></i>Tambah Buku
+            </a>
+            <a href="{{ route('admin.kategori.index') }}" class="btn btn-outline-primary admin-action-btn">
+                <i class="fas fa-tags me-2"></i>Kelola Kategori
+            </a>
+        </div>
+    </div>
+    <div class="admin-spotlight-card">
+        <h6><i class="fas fa-star me-2"></i>Buku Terbaru</h6>
+        <div class="admin-spotlight-list">
+            @foreach($buku->sortByDesc('created_at')->take(3) as $item)
+                <div class="admin-spotlight-item">
+                    <span class="text-truncate">{{ $item->judul }}</span>
+                    <small>{{ $item->jumlah }} stok</small>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</div>
+
+<div class="card admin-card">
+    <div class="card-header admin-card-header">
         <h5 class="mb-0">
             <i class="fas fa-book me-2"></i>Daftar Buku
         </h5>
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-striped table-hover mb-0">
-                <thead class="table-dark">
+            <table class="table table-striped table-hover mb-0 admin-table">
+                <thead>
                     <tr>
                         <th>No</th>
                         <th>Cover</th>
@@ -56,13 +95,13 @@
                             <td>{{ $item->penerbit ?? '-' }}</td>
                             <td>{{ $item->jumlah }}</td>
                             <td>
-                                <a href="{{ route('admin.buku.edit', $item->id) }}" class="btn btn-warning btn-sm">
+                                <a href="{{ route('admin.buku.edit', $item->id) }}" class="btn btn-warning btn-sm admin-icon-btn">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <form action="{{ route('admin.buku.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus buku ini?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">
+                                    <button type="submit" class="btn btn-danger btn-sm admin-icon-btn">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>

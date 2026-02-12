@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Anggota;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
@@ -25,6 +26,11 @@ class AuthController extends Controller
             ->first();
 
         if ($anggota) {
+            // Logout admin if currently logged in
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
             Session::put('anggota_id', $anggota->id);
             Session::put('anggota_nama', $anggota->nama);
             Session::put('anggota_nisn', $anggota->nisn);
