@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%); box-shadow: 0 2px 10px rgba(0,0,0,0.15);">
-    <div class="container-fluid px-3">
+    <div class="container-fluid px-4">
         <a class="navbar-brand fw-bold text-white" href="{{ route('home') }}">
             <i class="fas fa-book-open me-2"></i>Perpustakaan Digital
         </a>
@@ -7,7 +7,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link text-white {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">
                         <i class="fas fa-home me-1"></i> Home
@@ -29,10 +29,10 @@
                     </a>
                 </li>
             </ul>
-            <ul class="navbar-nav">
+            <ul class="navbar-nav mb-2 mb-lg-0">
                 @if(session('anggota_id'))
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle text-white d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user-circle me-1"></i> {{ session('anggota_nama') }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">

@@ -7,130 +7,204 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; }
         body { background-color: #f5f7fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .app-container { display: flex; min-height: 100vh; }
         
-        /* Navbar */
-        .app-navbar {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-        }
-        
-        /* Sidebar */
-        .app-sidebar {
+        .sidebar-container {
             width: 260px;
             background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%);
-            flex-shrink: 0;
-            transition: all 0.3s ease;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            min-height: calc(100vh - 56px);
+            transition: width 0.3s ease;
+            position: sticky;
+            top: 56px;
         }
-        .app-sidebar .nav-link {
+        .sidebar-container.collapsed { width: 70px; }
+        
+        .sidebar-link {
             color: rgba(255,255,255,0.85);
-            padding: 13px 20px;
+            padding: 12px 16px;
             border-radius: 8px;
-            margin: 4px 10px;
-            transition: all 0.2s ease;
-            font-size: 14px;
+            margin: 2px 8px;
             display: flex;
             align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+            text-decoration: none;
+            white-space: nowrap;
         }
-        .app-sidebar .nav-link i { margin-right: 12px; font-size: 1.1rem; width: 22px; text-align: center; }
-        .app-sidebar .nav-link:hover {
+        .sidebar-link:hover {
             background-color: rgba(255,255,255,0.1);
             color: #fff;
-            transform: translateX(3px);
         }
-        .app-sidebar .nav-link.active {
+        .sidebar-link.active {
             background: linear-gradient(90deg, #3498db 0%, #2980b9 100%);
             color: #fff;
-            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.4);
         }
-        .app-sidebar-title {
+        .sidebar-link i { width: 20px; text-align: center; flex-shrink: 0; }
+        .sidebar-container.collapsed .sidebar-link { justify-content: center; padding: 12px; }
+        .sidebar-container.collapsed .sidebar-link i { margin-right: 0; }
+        .sidebar-container.collapsed .sidebar-link span { display: none; }
+        
+        .sidebar-title {
             color: rgba(255,255,255,0.5);
             font-size: 11px;
             text-transform: uppercase;
-            padding: 20px 20px 10px;
+            padding: 20px 16px 10px;
             letter-spacing: 1.5px;
             font-weight: 600;
+            white-space: nowrap;
         }
+        .sidebar-container.collapsed .sidebar-title { display: none; }
         
-        /* Main Content */
-        .main-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-        .main-content { flex: 1; padding: 25px; background-color: #f5f7fa; }
-        
-        /* Cards */
-        .custom-card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-            transition: all 0.3s ease;
-            overflow: hidden;
+        .toggle-sidebar {
+            padding: 15px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: background 0.2s;
         }
-        .custom-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .toggle-sidebar:hover { background-color: rgba(255,255,255,0.05); }
+        .sidebar-container.collapsed .toggle-sidebar { justify-content: center; padding: 15px; }
+        .sidebar-container.collapsed .toggle-sidebar span { display: none; }
         
-        /* Footer */
-        .app-footer { background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%); }
-        
-        @media (max-width: 767px) {
-            .app-sidebar { position: fixed; top: 56px; left: 0; bottom: 0; z-index: 1000; transform: translateX(-100%); }
-            .app-sidebar.show { transform: translateX(0); }
+        .main-content {
+            flex: 1;
+            transition: margin-left 0.3s ease;
+            width: 100%;
         }
+        .main-content.expanded { margin-left: 0; }
     </style>
 </head>
 <body>
     <!-- Navbar -->
-    @include('components.navbar')
-
-    <div class="app-container">
-        <!-- Sidebar -->
-        <nav class="app-sidebar">
-            <div class="pt-3">
-                <div class="app-sidebar-title">Menu Utama</div>
-                <ul class="nav flex-column">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); box-shadow: 0 2px 10px rgba(0,0,0,0.15); z-index: 1030;">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold text-white" href="{{ route('home') }}">
+                <i class="fas fa-book-open me-2"></i>Perpustakaan Digital
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('peminjaman.index') ? 'active' : '' }}" href="{{ route('peminjaman.index') }}">
-                            <i class="fas fa-book-reader"></i> Ajuan Peminjaman
+                        <a class="nav-link text-white {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">
+                            <i class="fas fa-home me-1"></i> Home
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('peminjaman.riwayat') ? 'active' : '' }}" href="{{ route('peminjaman.riwayat') }}">
-                            <i class="fas fa-history"></i> Riwayat Peminjaman
+                        <a class="nav-link text-white {{ request()->routeIs('koleksi') ? 'active' : '' }}" href="{{ route('koleksi') }}">
+                            <i class="fas fa-book me-1"></i> Koleksi
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('pengembalian.index') ? 'active' : '' }}" href="{{ route('pengembalian.index') }}">
-                            <i class="fas fa-undo"></i> Pengembalian
+                        <a class="nav-link text-white {{ request()->routeIs('tentang') ? 'active' : '' }}" href="{{ route('tentang') }}">
+                            <i class="fas fa-info-circle me-1"></i> Tentang
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('pengembalian.riwayat') ? 'active' : '' }}" href="{{ route('pengembalian.riwayat') }}">
-                            <i class="fas fa-history"></i> Riwayat Pengembalian
+                        <a class="nav-link text-white {{ request()->routeIs('kontak') ? 'active' : '' }}" href="{{ route('kontak') }}">
+                            <i class="fas fa-envelope me-1"></i> Kontak
                         </a>
                     </li>
                 </ul>
+                <ul class="navbar-nav mb-2 mb-lg-0">
+                    @if(session('anggota_id'))
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-white d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i> {{ session('anggota_nama') }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{{ route('anggota') }}"><i class="fas fa-user me-2"></i>Profil</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{{ route('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                    @else
+                        <li class="nav-item">
+                            <a class="nav-link text-white {{ request()->routeIs('login') ? 'active' : '' }}" href="{{ route('login') }}">
+                                <i class="fas fa-sign-in-alt me-1"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white {{ request()->routeIs('register') ? 'active' : '' }}" href="{{ route('register') }}">
+                                <i class="fas fa-user-plus me-1"></i> Daftar
+                            </a>
+                        </li>
+                    @endif
+                </ul>
             </div>
-        </nav>
-
-        <!-- Main Content -->
-        <div class="main-wrapper">
-            <main class="main-content">@yield('content')</main>
-            
-            <!-- Footer -->
-            <footer class="app-footer text-white py-4">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-6 mb-3 mb-md-0">
-                            <h5 class="fw-bold"><i class="fas fa-book-open me-2"></i>Perpustakaan Digital</h5>
-                            <p class="mb-0 text-white-50">Menyediakan akses mudah ke berbagai koleksi buku.</p>
-                        </div>
-                        <div class="col-md-6 text-md-end"><p class="mb-0">&copy; {{ date('Y') }} Perpustakaan Digital</p></div>
-                    </div>
-                </div>
-            </footer>
         </div>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="d-flex" style="padding-top: 56px;">
+        @if(session('anggota_id'))
+        <!-- Sidebar -->
+        <div class="sidebar-container flex-shrink-0" id="sidebarContainer">
+            <div class="toggle-sidebar" onclick="toggleSidebar()">
+                <span><i class="fas fa-bars me-2"></i>Menu</span>
+                <i class="fas fa-chevron-left" id="sidebarArrow" style="transition: transform 0.3s;"></i>
+            </div>
+            <nav class="nav flex-column py-3">
+                <div class="sidebar-title">Menu Utama</div>
+                <a class="sidebar-link {{ request()->routeIs('peminjaman.index') ? 'active' : '' }}" href="{{ route('peminjaman.index') }}">
+                    <i class="fas fa-book-reader"></i> <span>Aju Peminjaman</span>
+                </a>
+                <a class="sidebar-link {{ request()->routeIs('peminjaman.riwayat') ? 'active' : '' }}" href="{{ route('peminjaman.riwayat') }}">
+                    <i class="fas fa-history"></i> <span>Riwayat Peminjaman</span>
+                </a>
+                <a class="sidebar-link {{ request()->routeIs('pengembalian.index') ? 'active' : '' }}" href="{{ route('pengembalian.index') }}">
+                    <i class="fas fa-undo"></i> <span>Pengembalian</span>
+                </a>
+                <a class="sidebar-link {{ request()->routeIs('pengembalian.riwayat') ? 'active' : '' }}" href="{{ route('pengembalian.riwayat') }}">
+                    <i class="fas fa-history"></i> <span>Riwayat Pengembalian</span>
+                </a>
+            </nav>
+        </div>
+        @endif
+        
+        <!-- Main Content -->
+        <main class="main-content p-4" id="mainContent">
+            @yield('content')
+        </main>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Restore sidebar state from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebarContainer');
+            const arrow = document.getElementById('sidebarArrow');
+            
+            if (sidebar && localStorage.getItem('sidebarCollapsed') === 'true') {
+                sidebar.classList.add('collapsed');
+                if (arrow) arrow.style.transform = 'rotate(-90deg)';
+            }
+        });
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebarContainer');
+            const arrow = document.getElementById('sidebarArrow');
+            
+            sidebar.classList.toggle('collapsed');
+            
+            // Save state to localStorage
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+            
+            // Rotate arrow
+            if (sidebar.classList.contains('collapsed')) {
+                arrow.style.transform = 'rotate(-90deg)';
+            } else {
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+    </script>
 </body>
 </html>
