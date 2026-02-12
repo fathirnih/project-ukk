@@ -22,4 +22,9 @@ class Buku extends Model
         'kategori_id',
         'jumlah',
     ];
+
+    public function kategori()
+    {
+        return $this->belongsTo(Kategori::class, 'kategori_id');
+    }
 }

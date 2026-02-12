@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AnggotaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BukuController;
+use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Anggota CRUD
         Route::resource('anggota', AnggotaController::class);
+
+        // Kategori CRUD
+        Route::resource('kategori', KategoriController::class);
 
         Route::get('/logout', [AdminController::class, 'logout'])->name('logout');
     });
