@@ -20,6 +20,8 @@ class AdminPeminjamanController extends Controller
         
         if ($status === 'pending') {
             $query->where('status_pinjam', 'pending');
+        } elseif ($status === 'ditolak') {
+            $query->where('status_pinjam', 'ditolak');
         } elseif ($status === 'menunggu_kembali') {
             $query->where('status_pinjam', 'disetujui')->whereDoesntHave('pengembalian');
         } elseif ($status === 'menunggu_kembali_admin') {
@@ -63,7 +65,7 @@ class AdminPeminjamanController extends Controller
             ]);
         });
 
-        return redirect()->route('admin.peminjaman.show', $id)->with('success', 'Peminjaman telah disetujui.');
+        return redirect()->route('admin.peminjaman.index', ['status' => 'disetujui'])->with('success', 'Peminjaman telah disetujui.');
     }
 
     // Tolak peminjaman
@@ -79,7 +81,7 @@ class AdminPeminjamanController extends Controller
             'catatan_penolakan' => $request->catatan_penolakan,
         ]);
 
-        return redirect()->route('admin.peminjaman.show', $id)->with('success', 'Peminjaman telah ditolak.');
+        return redirect()->route('admin.peminjaman.index', ['status' => 'ditolak'])->with('success', 'Peminjaman telah ditolak.');
     }
 
     // Konfirmasi pengembalian (tabel terpisah)
@@ -89,7 +91,7 @@ class AdminPeminjamanController extends Controller
         $pengembalian = $peminjaman->pengembalian;
         
         if (!$pengembalian) {
-            return redirect()->route('admin.peminjaman.show', $id)->with('error', 'Pengembalian tidak ditemukan.');
+            return redirect()->route('admin.pengembalian.index')->with('error', 'Pengembalian tidak ditemukan.');
         }
         
         DB::transaction(function () use ($peminjaman, $pengembalian) {
@@ -111,7 +113,7 @@ class AdminPeminjamanController extends Controller
             ]);
         });
 
-        return redirect()->route('admin.peminjaman.show', $id)->with('success', 'Pengembalian telah dikonfirmasi.');
+        return redirect()->route('admin.pengembalian.index')->with('success', 'Pengembalian telah dikonfirmasi.');
     }
 
     // Tolak pengembalian (tabel terpisah)
@@ -125,7 +127,7 @@ class AdminPeminjamanController extends Controller
         $pengembalian = $peminjaman->pengembalian;
         
         if (!$pengembalian) {
-            return redirect()->route('admin.peminjaman.show', $id)->with('error', 'Pengembalian tidak ditemukan.');
+            return redirect()->route('admin.pengembalian.index')->with('error', 'Pengembalian tidak ditemukan.');
         }
 
         $pengembalian->update([
@@ -133,6 +135,6 @@ class AdminPeminjamanController extends Controller
             'catatan_penolakan' => $request->catatan_penolakan,
         ]);
 
-        return redirect()->route('admin.peminjaman.show', $id)->with('success', 'Pengembalian telah ditolak.');
+        return redirect()->route('admin.pengembalian.index')->with('success', 'Pengembalian telah ditolak.');
     }
 }

@@ -63,7 +63,7 @@ class AdminPengembalianController extends Controller
             ]);
         });
 
-        return redirect()->route('admin.pengembalian.show', $id)->with('success', 'Pengembalian telah dikonfirmasi.');
+        return redirect()->route('admin.pengembalian.index')->with('success', 'Pengembalian telah dikonfirmasi.');
     }
 
     // Tolak pengembalian
@@ -80,6 +80,6 @@ class AdminPengembalianController extends Controller
             'catatan_penolakan' => $request->catatan_penolakan,
         ]);
 
-        return redirect()->route('admin.pengembalian.show', $id)->with('success', 'Pengembalian telah ditolak.');
+        return redirect()->route('admin.pengembalian.index')->with('success', 'Pengembalian telah ditolak.');
     }
 }

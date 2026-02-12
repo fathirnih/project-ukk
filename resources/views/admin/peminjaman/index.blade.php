@@ -25,6 +25,11 @@
             </a>
         </li>
         <li class="nav-item">
+            <a class="nav-link {{ $status == 'ditolak' ? 'active' : '' }}" href="{{ route('admin.peminjaman.index', ['status' => 'ditolak']) }}">
+                <i class="fas fa-times-circle me-1"></i> Ditolak
+            </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link {{ $status == 'selesai' ? 'active' : '' }}" href="{{ route('admin.peminjaman.index', ['status' => 'selesai']) }}">
                 <i class="fas fa-check-double me-1"></i> Selesai
             </a>
