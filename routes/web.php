@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AdminAuth;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminPeminjamanController;
 use App\Http\Controllers\AdminPengembalianController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\PengembalianController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Middleware\MemberAuth;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -21,8 +23,8 @@ Route::get('/koleksi', [PageController::class, 'koleksi'])->name('koleksi');
 Route::get('/buku/{id}', [PageController::class, 'detailBuku'])->name('buku.detail');
 Route::get('/anggota', [PageController::class, 'anggota'])->name('anggota');
 
-// Peminjaman Routes (Public - untuk anggota)
-Route::prefix('peminjaman')->name('peminjaman.')->group(function () {
+// Peminjaman Routes (Protected - untuk anggota)
+Route::middleware([MemberAuth::class])->prefix('peminjaman')->name('peminjaman.')->group(function () {
     Route::get('/', [PeminjamanController::class, 'index'])->name('index');
     Route::post('/', [PeminjamanController::class, 'store'])->name('store');
     Route::get('/ajuan-kembali/{id}', [PeminjamanController::class, 'ajukanKembali'])->name('ajuan-kembali');
@@ -30,8 +32,8 @@ Route::prefix('peminjaman')->name('peminjaman.')->group(function () {
     Route::get('/riwayat', [PeminjamanController::class, 'riwayatPeminjaman'])->name('riwayat');
 });
 
-// Pengembalian Routes (Public - untuk anggota)
-Route::prefix('pengembalian')->name('pengembalian.')->group(function () {
+// Pengembalian Routes (Protected - untuk anggota)
+Route::middleware([MemberAuth::class])->prefix('pengembalian')->name('pengembalian.')->group(function () {
     Route::get('/', [PengembalianController::class, 'index'])->name('index');
     Route::get('/riwayat', [PengembalianController::class, 'riwayat'])->name('riwayat');
     Route::get('/ajukan-ulang/{id}', [PeminjamanController::class, 'ajukanUlangPengembalian'])->name('ajukan-ulang');
@@ -44,7 +46,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/login', [AdminController::class, 'login'])->name('login.post');
 
     // Protected routes - requires admin login
-    Route::middleware(['auth'])->group(function () {
+    Route::middleware([AdminAuth::class])->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
         // Peminjaman CRUD

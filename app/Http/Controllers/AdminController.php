@@ -35,10 +35,6 @@ class AdminController extends Controller
 
     public function dashboard()
     {
-        if (!Auth::guard('web')->check()) {
-            return redirect()->route('admin.login');
-        }
-        
         $totalBuku = \App\Models\Buku::count();
         $totalAnggota = \App\Models\Anggota::count();
         $totalKategori = \App\Models\Kategori::count();
@@ -51,6 +47,10 @@ class AdminController extends Controller
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+        
+        // Clear member session as well
+        Session::forget(['anggota_id', 'anggota_nama', 'anggota_nisn']);
+        
         return redirect('/');
     }
 }
