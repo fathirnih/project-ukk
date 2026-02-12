@@ -1,14 +1,14 @@
 @extends('layouts.admin')
 
-@section('title', 'Detail Peminjaman')
+@section('title', 'Detail Pengembalian')
 
 @section('header')
-<i class="fas fa-eye me-2"></i>Detail Peminjaman
+<i class="fas fa-eye me-2"></i>Detail Pengembalian
 @endsection
 
 @section('content')
 <div class="mb-3">
-    <a href="{{ route('admin.peminjaman.index') }}" class="btn btn-secondary">
+    <a href="{{ route('admin.pengembalian.index') }}" class="btn btn-secondary">
         <i class="fas fa-arrow-left me-1"></i> Kembali
     </a>
 </div>
@@ -31,56 +31,48 @@
     <div class="col-md-4">
         <div class="card custom-card mb-3">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informasi Peminjaman</h5>
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informasi Pengembalian</h5>
             </div>
             <div class="card-body">
                 <table class="table table-borderless mb-0">
                     <tr>
                         <td class="fw-bold" style="width: 100px;">Kode</td>
-                        <td>: #{{ str_pad($peminjaman->id, 5, '0', STR_PAD_LEFT) }}</td>
+                        <td>: #{{ str_pad($pengembalian->id, 5, '0', STR_PAD_LEFT) }}</td>
                     </tr>
                     <tr>
                         <td class="fw-bold">Anggota</td>
-                        <td>: {{ $peminjaman->anggota->nama }}</td>
+                        <td>: {{ $pengembalian->peminjaman->anggota->nama }}</td>
                     </tr>
                     <tr>
                         <td class="fw-bold">NISN</td>
-                        <td>: {{ $peminjaman->anggota->nisn }}</td>
+                        <td>: {{ $pengembalian->peminjaman->anggota->nisn }}</td>
                     </tr>
                     <tr>
-                        <td class="fw-bold">Kelas</td>
-                        <td>: {{ $peminjaman->anggota->kelas ?? '-' }}</td>
+                        <td class="fw-bold">Tgl Pengajuan</td>
+                        <td>: {{ $pengembalian->tanggal_pengajuan->format('d/m/Y') }}</td>
                     </tr>
+                    @if($pengembalian->tanggal_dikembalikan)
                     <tr>
-                        <td class="fw-bold">Tgl Pinjam</td>
-                        <td>: {{ $peminjaman->tanggal_pinjam->format('d/m/Y') }}</td>
+                        <td class="fw-bold">Tgl Dikembalikan</td>
+                        <td>: {{ $pengembalian->tanggal_dikembalikan->format('d/m/Y') }}</td>
                     </tr>
+                    @endif
                     <tr>
-                        <td class="fw-bold">Tgl Kembali</td>
-                        <td>: {{ $peminjaman->tanggal_kembali->format('d/m/Y') }}</td>
-                    </tr>
-                    <tr>
-                        <td class="fw-bold">Status Pinjam</td>
+                        <td class="fw-bold">Status</td>
                         <td>: 
-                            @if($peminjaman->status_pinjam == 'pending')
-                                <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>Menunggu</span>
-                            @elseif($peminjaman->status_pinjam == 'disetujui')
-                                <span class="badge bg-success"><i class="fas fa-check me-1"></i>Disetujui</span>
-                            @else
+                            @if($pengembalian->status == 'pending_admin')
+                                <span class="badge bg-info text-dark"><i class="fas fa-clock me-1"></i>Menunggu</span>
+                            @elseif($pengembalian->status == 'ditolak')
                                 <span class="badge bg-danger"><i class="fas fa-times me-1"></i>Ditolak</span>
+                            @else
+                                <span class="badge bg-success"><i class="fas fa-check-double me-1"></i>Selesai</span>
                             @endif
                         </td>
                     </tr>
-                    @if($peminjaman->catatan)
-                    <tr>
-                        <td class="fw-bold">Catatan</td>
-                        <td>: {{ $peminjaman->catatan }}</td>
-                    </tr>
-                    @endif
-                    @if($peminjaman->catatan_penolakan)
+                    @if($pengembalian->catatan_penolakan)
                     <tr>
                         <td class="fw-bold text-danger">Alasan</td>
-                        <td class="text-danger">: {{ $peminjaman->catatan_penolakan }}</td>
+                        <td class="text-danger">: {{ $pengembalian->catatan_penolakan }}</td>
                     </tr>
                     @endif
                 </table>
@@ -88,41 +80,20 @@
         </div>
 
         <!-- Tombol Aksi -->
-        @if($peminjaman->status_pinjam == 'pending')
+        @if($pengembalian->status == 'pending_admin')
             <div class="card custom-card mb-3">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-success text-white">
                     <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Aksi</h5>
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <form action="{{ route('admin.peminjaman.setujui', $peminjaman->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-success w-100" onclick="return confirm('Setujui peminjaman ini?')">
-                                <i class="fas fa-check me-1"></i> Setujui Peminjaman
-                            </button>
-                        </form>
-                        <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#tolakModal">
-                            <i class="fas fa-times me-1"></i> Tolak Peminjaman
-                        </button>
-                    </div>
-                </div>
-            </div>
-        @endif
-
-        @if($peminjaman->status_pinjam == 'disetujui' && $peminjaman->status_kembali == 'pending_admin')
-            <div class="card custom-card mb-3">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-undo me-2"></i>Konfirmasi Pengembalian</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <form action="{{ route('admin.peminjaman.konfirmasi-kembali', $peminjaman->id) }}" method="POST">
+                        <form action="{{ route('admin.pengembalian.konfirmasi', $pengembalian->id) }}" method="POST">
                             @csrf
                             <button type="submit" class="btn btn-success w-100" onclick="return confirm('Konfirmasi bahwa buku telah dikembalikan?')">
                                 <i class="fas fa-check-double me-1"></i> Konfirmasi Pengembalian
                             </button>
                         </form>
-                        <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#tolakKembaliModal">
+                        <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#tolakModal">
                             <i class="fas fa-times me-1"></i> Tolak Pengembalian
                         </button>
                     </div>
@@ -134,7 +105,7 @@
     <div class="col-md-8">
         <div class="card custom-card">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-book me-2"></i>Buku yang Dipinjam</h5>
+                <h5 class="mb-0"><i class="fas fa-book me-2"></i>Buku yang Dikembalikan</h5>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -144,11 +115,10 @@
                                 <th class="text-center" style="width: 50px;">No</th>
                                 <th>Buku</th>
                                 <th class="text-center" style="width: 80px;">Jumlah</th>
-                                <th class="text-center" style="width: 100px;">Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($peminjaman->detailPeminjamans as $index => $detail)
+                            @forelse($pengembalian->peminjaman->detailPeminjamans as $index => $detail)
                                 <tr>
                                     <td class="text-center">{{ $index + 1 }}</td>
                                     <td>
@@ -171,19 +141,10 @@
                                         </div>
                                     </td>
                                     <td class="text-center">{{ $detail->jumlah }}</td>
-                                    <td class="text-center">
-                                        @if($detail->status == 'dipinjam')
-                                            <span class="badge bg-primary"><i class="fas fa-book me-1"></i>Dipinjam</span>
-                                        @elseif($detail->status == 'dikembalikan')
-                                            <span class="badge bg-success"><i class="fas fa-check me-1"></i>Kembali</span>
-                                        @else
-                                            <span class="badge bg-danger"><i class="fas fa-exclamation-triangle me-1"></i>Hilang</span>
-                                        @endif
-                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center py-4">
+                                    <td colspan="3" class="text-center py-4">
                                         <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
                                         <p class="text-muted mb-0">Tidak ada buku</p>
                                     </td>
@@ -202,40 +163,15 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title"><i class="fas fa-times-circle me-2"></i>Tolak Peminjaman</h5>
+                <h5 class="modal-title"><i class="fas fa-times-circle me-2"></i>Tolak Pengembalian</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('admin.peminjaman.tolak', $peminjaman->id) }}" method="POST">
+            <form action="{{ route('admin.pengembalian.tolak', $pengembalian->id) }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="catatan_penolakan" class="form-label fw-bold">Alasan Penolakan <span class="text-danger">*</span></label>
                         <textarea class="form-control" id="catatan_penolakan" name="catatan_penolakan" rows="3" required placeholder="Masukkan alasan penolakan..."></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-danger">Tolak</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Tolak Pengembalian -->
-<div class="modal fade" id="tolakKembaliModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title"><i class="fas fa-times-circle me-2"></i>Tolak Pengembalian</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <form action="{{ route('admin.peminjaman.tolak-kembali', $peminjaman->id) }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="catatan_penolakan_kembali" class="form-label fw-bold">Alasan Penolakan <span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="catatan_penolakan_kembali" name="catatan_penolakan" rows="3" required placeholder="Masukkan alasan penolakan pengembalian..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">

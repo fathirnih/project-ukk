@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends($app_layout ?? 'layouts.app')
 
 @section('title', 'Tentang - Perpustakaan Digital')
 

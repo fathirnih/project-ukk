@@ -28,7 +28,7 @@ class AuthController extends Controller
             Session::put('anggota_id', $anggota->id);
             Session::put('anggota_nama', $anggota->nama);
             Session::put('anggota_nisn', $anggota->nisn);
-            return redirect()->route('home')->with('success', 'Login berhasil!');
+            return redirect()->route('anggota')->with('success', 'Login berhasil!');
         }
 
         return redirect()->back()->with('error', 'NISN atau nama tidak ditemukan!');

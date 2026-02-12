@@ -6,9 +6,10 @@ use App\Models\Buku;
 use App\Models\Anggota;
 use App\Models\Peminjaman;
 use App\Models\DetailPeminjaman;
+use App\Models\Pengembalian;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class PeminjamanController extends Controller
 {
@@ -25,31 +26,30 @@ class PeminjamanController extends Controller
         }
         
         $bukus = Buku::where('jumlah', '>', 0)->get();
-        $riwayat = Peminjaman::with('detailPeminjamans.buku')
-                            ->where('anggota_id', $anggota->id)
-                            ->orderBy('created_at', 'desc')
-                            ->get();
         
-        return view('peminjaman.index', compact('anggota', 'bukus', 'riwayat'));
+        return view('peminjaman.index', compact('anggota', 'bukus'));
     }
 
     // Simpan ajuan pinjam
     public function store(Request $request)
     {
         $request->validate([
-            'buku_id' => 'required|array',
-            'buku_id.*' => 'exists:bukus,id',
-            'jumlah' => 'required|array',
-            'jumlah.*' => 'required|integer|min:1',
+            'buku_ids' => 'required',
             'tanggal_kembali' => 'required|date|after:today',
         ]);
+
+        $bukuIds = json_decode($request->buku_ids, true);
+        
+        if (empty($bukuIds)) {
+            return redirect()->route('peminjaman.index')->with('error', 'Pilih minimal satu buku!');
+        }
 
         $anggota = Anggota::find(Session::get('anggota_id'));
         if (!$anggota) {
             return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
         }
 
-        DB::transaction(function () use ($request, $anggota) {
+        DB::transaction(function () use ($request, $anggota, $bukuIds) {
             $peminjaman = Peminjaman::create([
                 'anggota_id' => $anggota->id,
                 'tanggal_pinjam' => now()->toDateString(),
@@ -59,23 +59,25 @@ class PeminjamanController extends Controller
                 'catatan' => $request->catatan ?? null,
             ]);
 
-            foreach ($request->buku_id as $index => $buku_id) {
-                $buku = Buku::find($buku_id);
-                if ($buku && $buku->jumlah >= $request->jumlah[$index]) {
+            foreach ($bukuIds as $bukuId) {
+                $buku = Buku::find($bukuId);
+                $jumlah = isset($request->jumlah[$bukuId]) ? (int)$request->jumlah[$bukuId] : 1;
+                
+                if ($buku && $buku->jumlah >= $jumlah && $jumlah > 0) {
                     DetailPeminjaman::create([
                         'peminjaman_id' => $peminjaman->id,
-                        'buku_id' => $buku_id,
-                        'jumlah' => $request->jumlah[$index],
+                        'buku_id' => $bukuId,
+                        'jumlah' => $jumlah,
                         'status' => 'dipinjam',
                     ]);
                 }
             }
         });
 
-        return redirect()->route('peminjaman.index')->with('success', 'Ajuan peminjaman berhasil dikirim. Menunggu persetujuan admin.');
+        return redirect('/peminjaman/riwayat')->with('success', 'Ajuan peminjaman berhasil dikirim. Menunggu persetujuan admin.');
     }
 
-    // Anggota mengajukan pengembalian
+    // Anggota mengajukan pengembalian (tabel terpisah)
     public function ajukanKembali($id)
     {
         $anggota = Anggota::find(Session::get('anggota_id'));
@@ -89,11 +91,93 @@ class PeminjamanController extends Controller
                                 ->first();
 
         if (!$peminjaman) {
-            return redirect()->route('peminjaman.index')->with('error', 'Peminjaman tidak ditemukan atau belum disetujui.');
+            return redirect()->route('peminjaman.riwayat')->with('error', 'Peminjaman tidak ditemukan atau belum disetujui.');
         }
 
-        $peminjaman->update(['status_kembali' => 'pending_admin']);
+        // Cek apakah sudah ada pengembalian yang pending
+        if ($peminjaman->pengembalian && $peminjaman->pengembalian->status == 'pending_admin') {
+            return redirect()->route('peminjaman.riwayat')->with('error', 'Pengembalian sudah diajukan dan menunggu konfirmasi.');
+        }
 
-        return redirect()->route('peminjaman.index')->with('success', 'Ajuan pengembalian berhasil dikirim. Menunggu konfirmasi admin.');
+        // Buat record pengembalian baru
+        Pengembalian::create([
+            'peminjaman_id' => $peminjaman->id,
+            'tanggal_pengajuan' => now()->toDateString(),
+            'status' => 'pending_admin',
+        ]);
+
+        return redirect()->route('peminjaman.riwayat')->with('success', 'Ajuan pengembalian berhasil dikirim. Menunggu konfirmasi admin.');
+    }
+
+    // Riwayat peminjaman (termasuk pengembalian)
+    public function riwayatPeminjaman()
+    {
+        $anggota = null;
+        if (Session::has('anggota_id')) {
+            $anggota = Anggota::find(Session::get('anggota_id'));
+        }
+        
+        if (!$anggota) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        // Tampilkan semua riwayat peminjaman
+        $riwayat = Peminjaman::with('detailPeminjamans.buku', 'pengembalian')
+                            ->where('anggota_id', $anggota->id)
+                            ->whereIn('status_pinjam', ['pending', 'disetujui', 'ditolak'])
+                            ->orderBy('created_at', 'desc')
+                            ->paginate(10);
+        
+        $response = response()->view('peminjaman.riwayat-peminjaman', compact('anggota', 'riwayat'));
+        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', '0');
+        return $response;
+    }
+
+    // Anggota mengajukan ulang peminjaman yang ditolak (update status, bukan buat baru)
+    public function ajukanUlang($id)
+    {
+        $anggota = Anggota::find(Session::get('anggota_id'));
+        if (!$anggota) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        $peminjaman = Peminjaman::where('anggota_id', $anggota->id)->find($id);
+        
+        if (!$peminjaman || $peminjaman->status_pinjam != 'ditolak') {
+            return redirect()->route('peminjaman.riwayat')->with('error', 'Peminjaman tidak ditemukan atau tidak bisa diajukan ulang.');
+        }
+
+        // Update status peminjaman yang ditolak menjadi pending
+        $peminjaman->update([
+            'status_pinjam' => 'pending',
+            'status_kembali' => 'pending',
+        ]);
+
+        return redirect()->route('peminjaman.riwayat')->with('success', 'Peminjaman berhasil diajukan ulang! Menunggu persetujuan admin.');
+    }
+
+    // Anggota mengajukan ulang pengembalian yang ditolak (tabel terpisah)
+    public function ajukanUlangPengembalian($id)
+    {
+        $anggota = Anggota::find(Session::get('anggota_id'));
+        if (!$anggota) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        $peminjaman = Peminjaman::where('anggota_id', $anggota->id)->find($id);
+        
+        if (!$peminjaman || !$peminjaman->pengembalian || $peminjaman->pengembalian->status != 'ditolak') {
+            return redirect()->route('peminjaman.riwayat')->with('error', 'Pengembalian tidak ditemukan atau tidak bisa diajukan ulang.');
+        }
+
+        // Update status pengembalian yang ditolak menjadi pending_admin
+        $peminjaman->pengembalian->update([
+            'status' => 'pending_admin',
+            'catatan_penolakan' => null,
+        ]);
+
+        return redirect()->route('peminjaman.riwayat')->with('success', 'Pengembalian berhasil diajukan ulang! Menunggu konfirmasi admin.');
     }
 }

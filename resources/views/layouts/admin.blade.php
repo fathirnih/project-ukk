@@ -28,6 +28,12 @@
                 <a href="{{ route('admin.kategori.index') }}" class="nav-link text-white py-2 px-3 rounded mb-1 {{ request()->routeIs('admin.kategori.*') ? 'bg-primary' : 'hover:bg-gray-700' }}">
                     <i class="fas fa-tags me-2"></i> Kelola Kategori
                 </a>
+                <a href="{{ route('admin.peminjaman.index') }}" class="nav-link text-white py-2 px-3 rounded mb-1 {{ request()->routeIs('admin.peminjaman.*') ? 'bg-primary' : 'hover:bg-gray-700' }}">
+                    <i class="fas fa-book-reader me-2"></i> Kelola Peminjaman
+                </a>
+                <a href="{{ route('admin.pengembalian.index') }}" class="nav-link text-white py-2 px-3 rounded mb-1 {{ request()->routeIs('admin.pengembalian.*') ? 'bg-primary' : 'hover:bg-gray-700' }}">
+                    <i class="fas fa-undo me-2"></i> Konfirmasi Pengembalian
+                </a>
                 <hr class="border-secondary">
                 <a href="{{ route('admin.logout') }}" class="nav-link text-white py-2 px-3 rounded mb-1 hover:bg-gray-700">
                     <i class="fas fa-sign-out-alt me-2"></i> Logout

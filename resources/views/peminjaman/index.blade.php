@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.member')
 
 @section('title', 'Peminjaman Buku - Perpustakaan Digital')
 
@@ -28,7 +28,7 @@
         </div>
     @else
         <!-- Form Pinjam Buku -->
-        <div class="card shadow-sm mb-4">
+        <div class="card shadow-sm">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">
                     <i class="fas fa-plus-circle me-2"></i>Ajukan Peminjaman
@@ -45,29 +45,73 @@
                                 <thead class="table-dark">
                                     <tr>
                                         <th style="width: 50px">Pilih</th>
-                                        <th>Judul</th>
-                                        <th>Pengarang</th>
-                                        <th>Tersedia</th>
+                                        <th style="width: 80px">Cover</th>
+                                        <th>Buku</th>
+                                        <th style="width: 100px">Stok</th>
+                                        <th style="width: 120px">Jumlah</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse($bukus as $buku)
-                                        <tr>
-                                            <td class="text-center">
-                                                <input type="checkbox" class="buku-checkbox" data-id="{{ $buku->id }}" data-judul="{{ $buku->judul }}">
+                                        <tr class="{{ $buku->jumlah <= 0 ? 'table-secondary' : '' }}">
+                                            <td class="text-center align-middle">
+                                                @if($buku->jumlah > 0)
+                                                    <input type="checkbox" class="buku-checkbox" data-id="{{ $buku->id }}" data-judul="{{ $buku->judul }}">
+                                                @else
+                                                    <span class="text-muted"><i class="fas fa-times"></i></span>
+                                                @endif
                                             </td>
-                                            <td>
-                                                {{ $buku->judul }}
+                                            <td class="text-center align-middle">
+                                                @if($buku->cover && file_exists(public_path('storage/covers/' . $buku->cover)))
+                                                    <img src="{{ asset('storage/covers/' . $buku->cover) }}" 
+                                                         alt="{{ $buku->judul }}" 
+                                                         class="img-thumbnail"
+                                                         style="width: 60px; height: 80px; object-fit: cover;">
+                                                @else
+                                                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" 
+                                                         style="width: 60px; height: 80px; font-size: 24px;">
+                                                        <i class="fas fa-book"></i>
+                                                    </div>
+                                                @endif
+                                            </td>
+                                            <td class="align-middle">
+                                                <strong>{{ $buku->judul }}</strong>
                                                 @if($buku->kategori)
                                                     <span class="badge bg-info">{{ $buku->kategori->nama }}</span>
                                                 @endif
+                                                <br>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-user me-1"></i>{{ $buku->pengarang }}
+                                                    @if($buku->penerbit)
+                                                        | {{ $buku->penerbit }}
+                                                    @endif
+                                                </small>
                                             </td>
-                                            <td>{{ $buku->pengarang }}</td>
-                                            <td>{{ $buku->jumlah }}</td>
+                                            <td class="text-center align-middle">
+                                                @if($buku->jumlah > 0)
+                                                    <span class="badge bg-success">{{ $buku->jumlah }}</span>
+                                                @else
+                                                    <span class="badge bg-danger">Habis</span>
+                                                @endif
+                                            </td>
+                                            <td class="align-middle">
+                                                @if($buku->jumlah > 0)
+                                                    <input type="number" 
+                                                           class="form-control form-control-sm jumlah-input" 
+                                                           name="jumlah[{{ $buku->id }}]" 
+                                                           min="1" 
+                                                           max="{{ $buku->jumlah }}" 
+                                                           value="1" 
+                                                           disabled
+                                                           data-max="{{ $buku->jumlah }}">
+                                                @else
+                                                    <span class="text-muted small">-</span>
+                                                @endif
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="text-center">Tidak ada buku tersedia.</td>
+                                            <td colspan="5" class="text-center">Tidak ada buku tersedia.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -75,102 +119,23 @@
                         </div>
                     </div>
 
-                    <div class="row" id="jumlahSection" style="display: none;">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Jumlah Buku</label>
-                            <input type="number" class="form-control" name="jumlah[]" min="1" value="1" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
                             <label class="form-label fw-bold">Tanggal Kembali</label>
                             <input type="date" class="form-control" name="tanggal_kembali" min="{{ now()->addDay()->format('Y-m-d') }}" required>
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Catatan</label>
+                            <textarea class="form-control" name="catatan" rows="2" placeholder="Catatan tambahan (opsional)"></textarea>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Catatan</label>
-                        <textarea class="form-control" name="catatan" rows="3" placeholder="Catatan tambahan (opsional)"></textarea>
-                    </div>
-
-                    <input type="hidden" name="buku_id" id="bukuIds">
+                    <input type="hidden" name="buku_ids" id="bukuIds">
 
                     <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
                         <i class="fas fa-paper-plane me-2"></i>Kirim Ajuan
                     </button>
                 </form>
-            </div>
-        </div>
-
-        <!-- Riwayat Peminjaman -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-history me-2"></i>Riwayat Peminjaman
-                </h5>
-            </div>
-            <div class="card-body">
-                @if($riwayat->count() > 0)
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>No</th>
-                                    <th>Tanggal</th>
-                                    <th>Buku</th>
-                                    <th>Status Pinjam</th>
-                                    <th>Status Kembali</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($riwayat as $index => $peminjaman)
-                                    <tr>
-                                        <td>{{ $index + 1 }}</td>
-                                        <td>
-                                            {{ $peminjaman->tanggal_pinjam->format('d/m/Y') }}<br>
-                                            <small class="text-muted">Kembali: {{ $peminjaman->tanggal_kembali->format('d/m/Y') }}</small>
-                                        </td>
-                                        <td>
-                                            @foreach($peminjaman->detailPeminjamans as $detail)
-                                                - {{ $detail->buku->judul }} ({{ $detail->jumlah }})<br>
-                                            @endforeach
-                                        </td>
-                                        <td>
-                                            @if($peminjaman->status_pinjam == 'pending')
-                                                <span class="badge bg-warning">Menunggu</span>
-                                            @elseif($peminjaman->status_pinjam == 'disetujui')
-                                                <span class="badge bg-success">Disetujui</span>
-                                            @else
-                                                <span class="badge bg-danger">Ditolak</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if($peminjaman->status_kembali == 'pending')
-                                                <span class="badge bg-secondary">-</span>
-                                            @elseif($peminjaman->status_kembali == 'pending_admin')
-                                                <span class="badge bg-warning">Menunggu</span>
-                                            @else
-                                                <span class="badge bg-success">Selesai</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if($peminjaman->status_pinjam == 'disetujui' && $peminjaman->status_kembali == 'pending')
-                                                <a href="{{ route('peminjaman.ajuan-kembali', $peminjaman->id) }}" class="btn btn-sm btn-warning" onclick="return confirm('Ajukan pengembalian buku?')">
-                                                    <i class="fas fa-undo"></i> Ajukan Kembali
-                                                </a>
-                                            @elseif($peminjaman->status_pinjam == 'ditolak')
-                                                <small class="text-danger">{{ $peminjaman->catatan_penolakan }}</small>
-                                            @else
-                                                -
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <p class="text-muted text-center mb-0">Belum ada riwayat peminjaman.</p>
-                @endif
             </div>
         </div>
     @endif
@@ -180,27 +145,51 @@
 document.addEventListener('DOMContentLoaded', function() {
     const checkboxes = document.querySelectorAll('.buku-checkbox');
     const submitBtn = document.getElementById('submitBtn');
-    const jumlahSection = document.getElementById('jumlahSection');
     const bukuIds = document.getElementById('bukuIds');
     
-    checkboxes.forEach(function(checkbox) {
-        checkbox.addEventListener('change', function() {
-            const selected = Array.from(checkboxes)
-                .filter(c => c.checked)
-                .map(c => c.dataset.id);
+    function updateFormState() {
+        const selectedIds = [];
+        
+        checkboxes.forEach(function(checkbox) {
+            const row = checkbox.closest('tr');
+            const jumlahInput = row.querySelector('.jumlah-input');
             
-            bukuIds.value = selected.join(',');
-            
-            if (selected.length > 0) {
-                submitBtn.disabled = false;
-                jumlahSection.style.display = 'flex';
+            if (checkbox.checked) {
+                selectedIds.push(checkbox.dataset.id);
+                jumlahInput.disabled = false;
+                jumlahInput.closest('td').classList.add('table-primary');
             } else {
-                submitBtn.disabled = true;
-                jumlahSection.style.display = 'none';
+                jumlahInput.disabled = true;
+                jumlahInput.value = 1;
+                jumlahInput.closest('td').classList.remove('table-primary');
             }
         });
+        
+        bukuIds.value = JSON.stringify(selectedIds);
+        
+        if (selectedIds.length > 0) {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
+        }
+    }
+    
+    checkboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', updateFormState);
     });
-
+    
+    document.querySelectorAll('.jumlah-input').forEach(function(input) {
+        input.addEventListener('change', function() {
+            const max = parseInt(this.dataset.max);
+            const value = parseInt(this.value);
+            
+            if (value < 1) this.value = 1;
+            if (value > max) this.value = max;
+            
+            updateFormState();
+        });
+    });
+    
     document.getElementById('peminjamanForm').addEventListener('submit', function(e) {
         const selected = Array.from(checkboxes)
             .filter(c => c.checked)

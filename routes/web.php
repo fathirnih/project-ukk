@@ -2,12 +2,14 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminPeminjamanController;
+use App\Http\Controllers\AdminPengembalianController;
 use App\Http\Controllers\AnggotaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\PengembalianController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +26,15 @@ Route::prefix('peminjaman')->name('peminjaman.')->group(function () {
     Route::get('/', [PeminjamanController::class, 'index'])->name('index');
     Route::post('/', [PeminjamanController::class, 'store'])->name('store');
     Route::get('/ajuan-kembali/{id}', [PeminjamanController::class, 'ajukanKembali'])->name('ajuan-kembali');
+    Route::get('/ajukan-ulang/{id}', [PeminjamanController::class, 'ajukanUlang'])->name('ajukan-ulang');
+    Route::get('/riwayat', [PeminjamanController::class, 'riwayatPeminjaman'])->name('riwayat');
+});
+
+// Pengembalian Routes (Public - untuk anggota)
+Route::prefix('pengembalian')->name('pengembalian.')->group(function () {
+    Route::get('/', [PengembalianController::class, 'index'])->name('index');
+    Route::get('/riwayat', [PengembalianController::class, 'riwayat'])->name('riwayat');
+    Route::get('/ajukan-ulang/{id}', [PeminjamanController::class, 'ajukanUlangPengembalian'])->name('ajukan-ulang');
 });
 
 // Admin Routes (Hidden)
@@ -42,6 +53,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/peminjaman/{id}/setujui', [AdminPeminjamanController::class, 'setujui'])->name('peminjaman.setujui');
         Route::post('/peminjaman/{id}/tolak', [AdminPeminjamanController::class, 'tolak'])->name('peminjaman.tolak');
         Route::post('/peminjaman/{id}/konfirmasi-kembali', [AdminPeminjamanController::class, 'konfirmasiKembali'])->name('peminjaman.konfirmasi-kembali');
+        Route::post('/peminjaman/{id}/tolak-kembali', [AdminPeminjamanController::class, 'tolakKembali'])->name('peminjaman.tolak-kembali');
+
+        // Pengembalian CRUD
+        Route::get('/pengembalian', [AdminPengembalianController::class, 'index'])->name('pengembalian.index');
+        Route::get('/pengembalian/{id}', [AdminPengembalianController::class, 'show'])->name('pengembalian.show');
+        Route::post('/pengembalian/{id}/konfirmasi', [AdminPengembalianController::class, 'konfirmasi'])->name('pengembalian.konfirmasi');
+        Route::post('/pengembalian/{id}/tolak', [AdminPengembalianController::class, 'tolak'])->name('pengembalian.tolak');
 
         // Buku CRUD
         Route::resource('buku', BukuController::class);

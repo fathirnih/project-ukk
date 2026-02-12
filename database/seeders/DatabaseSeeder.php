@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             KategoriSeeder::class,
             BukuSeeder::class,
             AdminUserSeeder::class,
+            AnggotaSeeder::class,
         ]);
     }
 }

@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Session;
 
 class PageController extends Controller
 {
+    // Helper function untuk memilih layout berdasarkan login
+    private function getLayout()
+    {
+        return Session::has('anggota_id') ? 'layouts.member' : 'layouts.app';
+    }
+
     public function home()
     {
         $featuredBuku = Buku::latest()->take(4)->get();

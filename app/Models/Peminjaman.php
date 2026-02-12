@@ -16,7 +16,6 @@ class Peminjaman extends Model
         'tanggal_pinjam',
         'tanggal_kembali',
         'status_pinjam',
-        'status_kembali',
         'catatan',
         'catatan_penolakan',
     ];
@@ -42,6 +41,11 @@ class Peminjaman extends Model
                     ->withPivot(['jumlah', 'status', 'tanggal_dikembalikan']);
     }
 
+    public function pengembalian()
+    {
+        return $this->hasOne(Pengembalian::class);
+    }
+
     public function scopePending($query)
     {
         return $query->where('status_pinjam', 'pending');
@@ -52,13 +56,8 @@ class Peminjaman extends Model
         return $query->where('status_pinjam', 'disetujui');
     }
 
-    public function scopeMenungguPengembalian($query)
+    public function scopeDitolak($query)
     {
-        return $query->where('status_pinjam', 'disetujui')->where('status_kembali', 'pending');
-    }
-
-    public function scopeMenungguPengembalianAdmin($query)
-    {
-        return $query->where('status_kembali', 'pending_admin');
+        return $query->where('status_pinjam', 'ditolak');
     }
 }
