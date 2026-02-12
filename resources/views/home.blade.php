@@ -17,10 +17,17 @@
         @forelse($featuredBuku as $buku)
             <div class="col-md-3 mb-4">
                 <div class="card h-100">
+                    @if($buku->cover && file_exists(public_path('covers/' . $buku->cover)))
+                        <img src="{{ asset('covers/' . $buku->cover) }}" class="card-img-top" alt="{{ $buku->judul }}" style="height: 250px; object-fit: cover;">
+                    @else
+                        <div class="bg-secondary d-flex align-items-center justify-content-center" style="height: 250px;">
+                            <span class="text-white"><i class="fas fa-book fa-3x"></i></span>
+                        </div>
+                    @endif
                     <div class="card-body">
                         <h5 class="card-title">{{ $buku->judul }}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">{{ $buku->pengarang }}</h6>
-                        <p class="card-text small">{{ Str::limit($buku->deskripsi, 100) }}</p>
+                        <p class="card-text small">{{ Str::limit($buku->deskripsi, 80) }}</p>
                     </div>
                     <div class="card-footer bg-transparent">
                         <small class="text-muted">Penerbit: {{ $buku->penerbit ?? '-' }}</small>

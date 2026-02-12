@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AnggotaController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BukuController;
 use App\Http\Controllers\PageController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +26,13 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+        // Buku CRUD
+        Route::resource('buku', BukuController::class);
+
+        // Anggota CRUD
+        Route::resource('anggota', AnggotaController::class);
+
         Route::get('/logout', [AdminController::class, 'logout'])->name('logout');
     });
 

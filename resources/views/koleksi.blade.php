@@ -9,6 +9,13 @@
         @forelse($buku as $item)
             <div class="col-md-3 mb-4">
                 <div class="card h-100 shadow-sm">
+                    @if($item->cover && file_exists(public_path('covers/' . $item->cover)))
+                        <img src="{{ asset('covers/' . $item->cover) }}" class="card-img-top" alt="{{ $item->judul }}" style="height: 250px; object-fit: cover;">
+                    @else
+                        <div class="bg-secondary d-flex align-items-center justify-content-center" style="height: 250px;">
+                            <span class="text-white"><i class="fas fa-book fa-3x"></i></span>
+                        </div>
+                    @endif
                     <div class="card-body">
                         <h5 class="card-title">{{ $item->judul }}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">{{ $item->pengarang }}</h6>
