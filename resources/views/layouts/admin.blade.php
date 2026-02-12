@@ -29,12 +29,9 @@
                     <i class="fas fa-tags me-2"></i> Kelola Kategori
                 </a>
                 <hr class="border-secondary">
-                <form action="{{ route('admin.logout') }}" method="POST" class="d-inline w-100">
-                    @csrf
-                    <button type="submit" class="nav-link text-white py-2 px-3 rounded mb-1 hover:bg-gray-700 w-100 text-start border-0 bg-transparent cursor-pointer">
-                        <i class="fas fa-sign-out-alt me-2"></i> Logout
-                    </button>
-                </form>
+                <a href="{{ route('admin.logout') }}" class="nav-link text-white py-2 px-3 rounded mb-1 hover:bg-gray-700">
+                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                </a>
                 <hr class="border-secondary">
                 <a href="{{ route('home') }}" target="_blank" class="nav-link text-white py-2 px-3 rounded mb-1 hover:bg-gray-700">
                     <i class="fas fa-external-link-alt me-2"></i> Lihat Website
