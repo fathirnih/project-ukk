@@ -21,6 +21,8 @@ class DetailPeminjaman extends Model
 
     protected $casts = [
         'tanggal_dikembalikan' => 'date',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function peminjaman()

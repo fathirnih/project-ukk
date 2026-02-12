@@ -9,6 +9,8 @@ class Pengembalian extends Model
 {
     use HasFactory;
 
+    protected $table = 'pengembalians';
+
     protected $fillable = [
         'peminjaman_id',
         'tanggal_pengajuan',
@@ -25,5 +27,15 @@ class Pengembalian extends Model
     public function peminjaman()
     {
         return $this->belongsTo(Peminjaman::class);
+    }
+
+    public function anggota()
+    {
+        return $this->hasOneThrough(Anggota::class, Peminjaman::class, 'id', 'id', 'peminjaman_id', 'anggota_id');
+    }
+
+    public function detailPeminjamans()
+    {
+        return $this->hasManyThrough(DetailPeminjaman::class, Peminjaman::class, 'id', 'peminjaman_id', 'peminjaman_id', 'id');
     }
 }

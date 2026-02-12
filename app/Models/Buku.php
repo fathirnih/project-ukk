@@ -27,4 +27,15 @@ class Buku extends Model
     {
         return $this->belongsTo(Kategori::class, 'kategori_id');
     }
+
+    public function detailPeminjamans()
+    {
+        return $this->hasMany(DetailPeminjaman::class);
+    }
+
+    public function peminjamans()
+    {
+        return $this->belongsToMany(Peminjaman::class, 'detail_peminjamans')
+                    ->withPivot(['jumlah', 'status', 'tanggal_dikembalikan']);
+    }
 }

@@ -16,6 +16,11 @@ class Kategori extends Model
         'keterangan',
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     public function buku()
     {
         return $this->hasMany(Buku::class, 'kategori_id');
