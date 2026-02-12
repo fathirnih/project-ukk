@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Anggota;
 use App\Models\Buku;
+use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
@@ -29,6 +30,12 @@ class PageController extends Controller
     {
         $buku = Buku::all();
         return view('koleksi', compact('buku'));
+    }
+
+    public function detailBuku($id)
+    {
+        $buku = Buku::with('kategori')->findOrFail($id);
+        return view('buku-detail', compact('buku'));
     }
 
     public function anggota()

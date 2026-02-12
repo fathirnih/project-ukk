@@ -10,10 +10,11 @@ class AdminController extends Controller
 {
     public function showLogin()
     {
-        // Hidden login - only accessible if not logged in
-        if (Auth::check()) {
+        // Check if already logged in as admin
+        if (Auth::guard('web')->check()) {
             return redirect()->route('admin.dashboard');
         }
+        
         return view('admin.login');
     }
 
@@ -24,7 +25,7 @@ class AdminController extends Controller
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::guard('web')->attempt($credentials)) {
             $request->session()->regenerate();
             return redirect()->route('admin.dashboard')->with('success', 'Selamat datang, Admin!');
         }
@@ -34,15 +35,22 @@ class AdminController extends Controller
 
     public function dashboard()
     {
-        // Middleware check is done via route
-        return view('admin.dashboard');
+        if (!Auth::guard('web')->check()) {
+            return redirect()->route('admin.login');
+        }
+        
+        $totalBuku = \App\Models\Buku::count();
+        $totalAnggota = \App\Models\Anggota::count();
+        $totalKategori = \App\Models\Kategori::count();
+        
+        return view('admin.dashboard', compact('totalBuku', 'totalAnggota', 'totalKategori'));
     }
 
     public function logout(Request $request)
     {
-        Auth::logout();
+        Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('admin.login')->with('success', 'Logout berhasil!');
+        return redirect('/');
     }
 }
