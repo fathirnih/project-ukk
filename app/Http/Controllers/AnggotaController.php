@@ -10,7 +10,11 @@ class AnggotaController extends Controller
     public function index()
     {
         $anggota = Anggota::all();
-        return view('admin.anggota.index', compact('anggota'));
+        $totalAnggota = Anggota::count();
+        $denganKelas = Anggota::whereNotNull('kelas')->where('kelas', '!=', '')->count();
+        $tanpaAlamat = Anggota::whereNull('alamat')->orWhere('alamat', '')->count();
+
+        return view('admin.anggota.index', compact('anggota', 'totalAnggota', 'denganKelas', 'tanpaAlamat'));
     }
 
     public function create()

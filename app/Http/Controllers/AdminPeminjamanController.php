@@ -15,6 +15,12 @@ class AdminPeminjamanController extends Controller
     public function index(Request $request)
     {
         $status = $request->get('status', 'all');
+        $statPending = Peminjaman::where('status_pinjam', 'pending')->count();
+        $statDisetujui = Peminjaman::where('status_pinjam', 'disetujui')->count();
+        $statDitolak = Peminjaman::where('status_pinjam', 'ditolak')->count();
+        $statSelesai = Peminjaman::whereHas('pengembalian', function ($q) {
+            $q->where('status', 'selesai');
+        })->count();
         
         $query = Peminjaman::with('anggota', 'detailPeminjamans.buku', 'pengembalian');
         
@@ -36,7 +42,14 @@ class AdminPeminjamanController extends Controller
         
         $peminjamans = $query->orderBy('created_at', 'desc')->paginate(10);
         
-        return view('admin.peminjaman.index', compact('peminjamans', 'status'));
+        return view('admin.peminjaman.index', compact(
+            'peminjamans',
+            'status',
+            'statPending',
+            'statDisetujui',
+            'statDitolak',
+            'statSelesai'
+        ));
     }
 
     // Detail peminjaman

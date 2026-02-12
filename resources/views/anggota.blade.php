@@ -3,19 +3,19 @@
 @section('title', 'Profil Anggota - Perpustakaan Digital')
 
 @section('content')
-<div class="container-fluid">
+<section class="member-page member-main-block">
     @if($anggota)
         <div class="row">
             <div class="col-lg-8 mx-auto">
-                <div class="card card-custom">
-                    <div class="card-header bg-primary text-white">
+                <div class="card member-card border-0">
+                    <div class="card-header member-card-header">
                         <h4 class="mb-0">
                             <i class="fas fa-user me-2"></i>Profil Anggota
                         </h4>
                     </div>
                     <div class="card-body">
                         <div class="text-center mb-4">
-                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white mx-auto mb-3" style="width: 100px; height: 100px;">
+                            <div class="member-avatar mx-auto mb-3">
                                 <i class="fas fa-user fa-4x"></i>
                             </div>
                             <h4 class="fw-bold mb-0">{{ $anggota->nama }}</h4>
@@ -62,12 +62,12 @@
                     <div class="card-footer bg-transparent">
                         <div class="row">
                             <div class="col-6">
-                                <a href="{{ route('koleksi') }}" class="btn btn-outline-primary w-100">
+                                <a href="{{ route('koleksi') }}" class="btn btn-outline-primary w-100 member-action-btn">
                                     <i class="fas fa-book me-2"></i>Lihat Koleksi
                                 </a>
                             </div>
                             <div class="col-6">
-                                <a href="{{ route('peminjaman.index') }}" class="btn btn-success w-100">
+                                <a href="{{ route('peminjaman.index') }}" class="btn btn-success w-100 member-action-btn">
                                     <i class="fas fa-book-reader me-2"></i>Ajuan Peminjaman
                                 </a>
                             </div>
@@ -79,7 +79,7 @@
     @else
         <div class="row justify-content-center">
             <div class="col-md-5">
-                <div class="card card-custom text-center p-5">
+                <div class="card member-card border-0 text-center p-5">
                     <i class="fas fa-user-circle fa-5x text-muted mb-4"></i>
                     <h4 class="mb-3">Silakan Login</h4>
                     <p class="text-muted mb-4">Login untuk melihat profil anggota Anda.</p>
@@ -95,5 +95,5 @@
             </div>
         </div>
     @endif
-</div>
+</section>
 @endsection

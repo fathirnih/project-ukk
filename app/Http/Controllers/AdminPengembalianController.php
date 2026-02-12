@@ -15,6 +15,9 @@ class AdminPengembalianController extends Controller
     public function index(Request $request)
     {
         $status = $request->get('status', 'all');
+        $statPending = Pengembalian::where('status', 'pending_admin')->count();
+        $statDitolak = Pengembalian::where('status', 'ditolak')->count();
+        $statSelesai = Pengembalian::where('status', 'selesai')->count();
         
         $query = Pengembalian::with('peminjaman.anggota', 'peminjaman.detailPeminjamans.buku');
         
@@ -28,7 +31,13 @@ class AdminPengembalianController extends Controller
         
         $pengembalian = $query->orderBy('created_at', 'desc')->paginate(10);
         
-        return view('admin.pengembalian.index', compact('pengembalian', 'status'));
+        return view('admin.pengembalian.index', compact(
+            'pengembalian',
+            'status',
+            'statPending',
+            'statDitolak',
+            'statSelesai'
+        ));
     }
 
     // Detail pengembalian

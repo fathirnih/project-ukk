@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8D3428"/>
+      <stop offset="100%" stop-color="#C76335"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="900" fill="url(#g)"/>
+  <rect x="42" y="42" width="516" height="816" rx="18" fill="none" stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="3"/>
+  <text x="56" y="120" fill="#FFFFFF" fill-opacity="0.9" font-family="Segoe UI, Arial" font-size="28" letter-spacing="2">PERPUSTAKAAN DIGITAL</text>
+  <text x="56" y="320" fill="#FFFFFF" font-family="Segoe UI, Arial" font-size="78" font-weight="700">RINDU</text>
+  <text x="56" y="760" fill="#FFF2EA" font-family="Segoe UI, Arial" font-size="30">Tere Liye</text>
+</svg>

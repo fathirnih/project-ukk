@@ -12,7 +12,11 @@ class BukuController extends Controller
     public function index()
     {
         $buku = Buku::all();
-        return view('admin.buku.index', compact('buku'));
+        $totalBuku = Buku::count();
+        $stokMenipis = Buku::where('jumlah', '<=', 3)->count();
+        $tanpaCover = Buku::whereNull('cover')->orWhere('cover', '')->count();
+
+        return view('admin.buku.index', compact('buku', 'totalBuku', 'stokMenipis', 'tanpaCover'));
     }
 
     public function create()

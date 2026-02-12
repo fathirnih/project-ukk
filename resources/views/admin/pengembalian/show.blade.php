@@ -8,18 +8,58 @@
 
 @section('content')
 <div class="mb-3">
-    <a href="{{ route('admin.pengembalian.index') }}" class="btn btn-secondary">
+    <a href="{{ route('admin.pengembalian.index') }}" class="btn btn-secondary admin-action-btn">
         <i class="fas fa-arrow-left me-1"></i> Kembali
     </a>
 </div>
 
+<div class="admin-page-intro">
+    <h6><i class="fas fa-clipboard-list me-2"></i>Detail Proses Pengembalian</h6>
+    <p>Periksa informasi pengembalian dan daftar buku sebelum konfirmasi atau penolakan.</p>
+</div>
+
+<div class="admin-index-overview mb-4">
+    <div class="admin-mini-stat">
+        <span>Kode Pengembalian</span>
+        <strong>#{{ str_pad($pengembalian->id, 5, '0', STR_PAD_LEFT) }}</strong>
+    </div>
+    <div class="admin-mini-stat">
+        <span>Total Judul</span>
+        <strong>{{ $pengembalian->peminjaman->detailPeminjamans->count() }}</strong>
+    </div>
+    <div class="admin-mini-stat">
+        <span>Total Qty</span>
+        <strong>{{ $pengembalian->peminjaman->detailPeminjamans->sum('jumlah') }}</strong>
+    </div>
+</div>
+
+<div class="admin-content-grid mb-4">
+    <div class="admin-spotlight-card">
+        <h6><i class="fas fa-timeline me-2"></i>Timeline Pengembalian</h6>
+        <div class="admin-spotlight-list">
+            <div class="admin-spotlight-item"><span>Diajukan</span><small>{{ $pengembalian->created_at->format('d/m/Y H:i') }}</small></div>
+            <div class="admin-spotlight-item"><span>Tanggal Pengajuan</span><small>{{ $pengembalian->tanggal_pengajuan->format('d/m/Y') }}</small></div>
+            <div class="admin-spotlight-item"><span>Dikembalikan</span><small>{{ $pengembalian->tanggal_dikembalikan?->format('d/m/Y') ?? '-' }}</small></div>
+        </div>
+    </div>
+    <div class="admin-spotlight-card">
+        <h6><i class="fas fa-user-check me-2"></i>Profil Anggota</h6>
+        <div class="admin-spotlight-list">
+            <div class="admin-spotlight-item"><span>Nama</span><small>{{ $pengembalian->peminjaman->anggota->nama }}</small></div>
+            <div class="admin-spotlight-item"><span>NISN</span><small>{{ $pengembalian->peminjaman->anggota->nisn }}</small></div>
+            <div class="admin-spotlight-item"><span>Status</span><small>{{ $pengembalian->status }}</small></div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-md-4">
-        <div class="card custom-card mb-3">
-            <div class="card-header bg-primary text-white">
+        <div class="card admin-card mb-3">
+            <div class="card-header admin-card-header">
                 <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informasi Pengembalian</h5>
             </div>
             <div class="card-body">
+                <div class="admin-detail-info">
                 <table class="table table-borderless mb-0">
                     <tr>
                         <td class="fw-bold" style="width: 100px;">Kode</td>
@@ -62,24 +102,25 @@
                     </tr>
                     @endif
                 </table>
+                </div>
             </div>
         </div>
 
         <!-- Tombol Aksi -->
         @if($pengembalian->status == 'pending_admin')
-            <div class="card custom-card mb-3">
-                <div class="card-header bg-success text-white">
+            <div class="card admin-card mb-3">
+                <div class="card-header admin-card-header">
                     <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Aksi</h5>
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
                         <form action="{{ route('admin.pengembalian.konfirmasi', $pengembalian->id) }}" method="POST">
                             @csrf
-                            <button type="submit" class="btn btn-success w-100" onclick="return confirm('Konfirmasi bahwa buku telah dikembalikan?')">
+                            <button type="submit" class="btn btn-success w-100 admin-action-btn" onclick="return confirm('Konfirmasi bahwa buku telah dikembalikan?')">
                                 <i class="fas fa-check-double me-1"></i> Konfirmasi Pengembalian
                             </button>
                         </form>
-                        <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#tolakModal">
+                        <button type="button" class="btn btn-danger w-100 admin-action-btn" data-bs-toggle="modal" data-bs-target="#tolakModal">
                             <i class="fas fa-times me-1"></i> Tolak Pengembalian
                         </button>
                     </div>
@@ -89,14 +130,14 @@
     </div>
 
     <div class="col-md-8">
-        <div class="card custom-card">
-            <div class="card-header bg-primary text-white">
+        <div class="card admin-card">
+            <div class="card-header admin-card-header">
                 <h5 class="mb-0"><i class="fas fa-book me-2"></i>Buku yang Dikembalikan</h5>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-dark">
+                    <table class="table table-hover mb-0 admin-table">
+                        <thead>
                             <tr>
                                 <th class="text-center" style="width: 50px;">No</th>
                                 <th>Buku</th>
@@ -110,13 +151,11 @@
                                     <td>
                                         <div class="d-flex align-items-center">
                                             @if($detail->buku->cover && file_exists(public_path('storage/covers/' . $detail->buku->cover)))
-                                                <img src="{{ asset('storage/covers/' . $detail->buku->cover) }}" 
-                                                     alt="{{ $detail->buku->judul }}" 
-                                                     class="img-thumbnail me-2"
-                                                     style="width: 45px; height: 60px; object-fit: cover;">
+                                                <img src="{{ asset('storage/covers/' . $detail->buku->cover) }}"
+                                                     alt="{{ $detail->buku->judul }}"
+                                                     class="img-thumbnail me-2 admin-detail-book-cover">
                                             @else
-                                                <div class="bg-secondary text-white me-2 d-flex align-items-center justify-content-center" 
-                                                     style="width: 45px; height: 60px; font-size: 18px;">
+                                                <div class="bg-secondary text-white me-2 d-flex align-items-center justify-content-center admin-detail-book-fallback">
                                                     <i class="fas fa-book"></i>
                                                 </div>
                                             @endif
@@ -156,7 +195,7 @@
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="catatan_penolakan" class="form-label fw-bold">Alasan Penolakan <span class="text-danger">*</span></label>
+                        <label for="catatan_penolakan" class="form-label admin-form-label">Alasan Penolakan <span class="text-danger">*</span></label>
                         <textarea class="form-control" id="catatan_penolakan" name="catatan_penolakan" rows="3" required placeholder="Masukkan alasan penolakan..."></textarea>
                     </div>
                 </div>

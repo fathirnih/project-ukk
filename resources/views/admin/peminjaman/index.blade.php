@@ -7,8 +7,50 @@
 @endsection
 
 @section('content')
+<div class="admin-page-intro">
+    <h6><i class="fas fa-arrows-rotate me-2"></i>Workflow Peminjaman</h6>
+    <p>Setujui atau tolak peminjaman berdasarkan ketersediaan buku dan riwayat anggota.</p>
+</div>
+
+<div class="admin-index-overview mb-4">
+    <div class="admin-mini-stat">
+        <span>Menunggu</span>
+        <strong>{{ $statPending }}</strong>
+    </div>
+    <div class="admin-mini-stat">
+        <span>Disetujui</span>
+        <strong>{{ $statDisetujui }}</strong>
+    </div>
+    <div class="admin-mini-stat">
+        <span>Ditolak</span>
+        <strong>{{ $statDitolak }}</strong>
+    </div>
+    <div class="admin-mini-stat">
+        <span>Selesai</span>
+        <strong>{{ $statSelesai }}</strong>
+    </div>
+</div>
+
+<div class="admin-content-grid mb-4">
+    <div class="admin-spotlight-card">
+        <h6><i class="fas fa-list-check me-2"></i>Prioritas Hari Ini</h6>
+        <div class="admin-spotlight-list">
+            <div class="admin-spotlight-item"><span>Permintaan menunggu</span><small>{{ $statPending }}</small></div>
+            <div class="admin-spotlight-item"><span>Butuh tindak lanjut</span><small>{{ $statDisetujui }}</small></div>
+        </div>
+    </div>
+    <div class="admin-spotlight-card">
+        <h6><i class="fas fa-link me-2"></i>Pintasan</h6>
+        <div class="d-flex gap-2 flex-wrap">
+            <a class="btn btn-outline-primary admin-action-btn" href="{{ route('admin.peminjaman.index', ['status' => 'pending']) }}">Pending</a>
+            <a class="btn btn-outline-primary admin-action-btn" href="{{ route('admin.peminjaman.index', ['status' => 'disetujui']) }}">Disetujui</a>
+            <a class="btn btn-outline-primary admin-action-btn" href="{{ route('admin.pengembalian.index', ['status' => 'pending']) }}">Pengembalian</a>
+        </div>
+    </div>
+</div>
+
 <div class="mb-4">
-    <ul class="nav nav-tabs custom-tabs">
+    <ul class="nav nav-tabs admin-tabs border-0">
         <li class="nav-item">
             <a class="nav-link {{ $status == 'all' ? 'active' : '' }}" href="{{ route('admin.peminjaman.index') }}">
                 <i class="fas fa-list me-1"></i> Semua
@@ -37,11 +79,11 @@
     </ul>
 </div>
 
-<div class="card custom-card">
+<div class="card admin-card">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-dark">
+            <table class="table table-hover mb-0 admin-table">
+                <thead>
                     <tr>
                         <th class="text-center" style="width: 50px;">No</th>
                         <th>Anggota</th>
@@ -76,7 +118,7 @@
                                 @endif
                             </td>
                             <td class="text-center">
-                                <a href="{{ route('admin.peminjaman.show', $peminjaman->id) }}" class="btn btn-sm btn-primary" title="Lihat Detail">
+                                <a href="{{ route('admin.peminjaman.show', $peminjaman->id) }}" class="btn btn-sm btn-primary admin-icon-btn" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
                                 </a>
                             </td>
@@ -98,23 +140,4 @@
 <div class="mt-3">
     {{ $peminjamans->links() }}
 </div>
-
-<style>
-    .custom-tabs .nav-link {
-        color: #495057;
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        margin-right: 5px;
-        padding: 8px 16px;
-    }
-    .custom-tabs .nav-link:hover {
-        background-color: #e9ecef;
-    }
-    .custom-tabs .nav-link.active {
-        background-color: #0d6efd;
-        color: white;
-        border-color: #0d6efd;
-    }
-</style>
 @endsection

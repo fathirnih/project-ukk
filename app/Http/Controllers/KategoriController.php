@@ -9,8 +9,12 @@ class KategoriController extends Controller
 {
     public function index()
     {
-        $kategori = Kategori::all();
-        return view('admin.kategori.index', compact('kategori'));
+        $kategori = Kategori::withCount('buku')->get();
+        $totalKategori = Kategori::count();
+        $totalBukuTerkategori = \App\Models\Buku::whereNotNull('kategori_id')->count();
+        $kategoriKosong = Kategori::doesntHave('buku')->count();
+
+        return view('admin.kategori.index', compact('kategori', 'totalKategori', 'totalBukuTerkategori', 'kategoriKosong'));
     }
 
     public function create()

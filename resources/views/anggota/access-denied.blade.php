@@ -3,21 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Akses Ditolak - Perpustakaan Digital</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Akses Anggota Ditolak - Perpustakaan Digital</title>
+    @vite(['resources/css/site-theme.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
-    <div class="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-        <div class="mb-4">
-            <svg class="mx-auto h-16 w-16 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-            </svg>
+<body class="auth-layout access-layout">
+    <div class="container access-shell">
+        <div class="access-card text-center mx-auto">
+            <div class="access-icon warning">
+                <i class="fas fa-user-lock"></i>
+            </div>
+            <div class="access-code">403</div>
+            <h1 class="access-title">Akses Anggota Ditolak</h1>
+            <p class="access-text">Akun admin tidak dapat membuka halaman anggota. Silakan login sebagai anggota untuk melanjutkan.</p>
+            <div class="access-actions">
+                <a href="{{ route('login') }}" class="btn btn-primary px-4">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login Anggota
+                </a>
+                <a href="{{ route('admin.login') }}" class="btn btn-outline-secondary px-4">
+                    <i class="fas fa-user-shield me-2"></i>Login Admin
+                </a>
+            </div>
         </div>
-        <h1 class="text-2xl font-bold text-gray-800 mb-2">Akses Ditolak</h1>
-        <p class="text-gray-600 mb-6">Akses anggota tidak diperbolehkan untuk admin.</p>
-        <a href="/admin/dashboard" class="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-            Kembali ke Dashboard Admin
-        </a>
     </div>
 </body>
 </html>
