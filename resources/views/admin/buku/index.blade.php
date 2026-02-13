@@ -24,56 +24,81 @@
     </div>
 </div>
 
-<div class="admin-content-grid mb-4">
-    <div class="admin-spotlight-card">
-        <h6><i class="fas fa-bolt me-2"></i>Aksi Cepat</h6>
-        <div class="d-flex gap-2 flex-wrap">
-            <a href="{{ route('admin.buku.create') }}" class="btn btn-primary admin-action-btn">
-                <i class="fas fa-plus me-2"></i>Tambah Buku
-            </a>
-            <a href="{{ route('admin.kategori.index') }}" class="btn btn-outline-primary admin-action-btn">
-                <i class="fas fa-tags me-2"></i>Kelola Kategori
-            </a>
+<div class="admin-form-shell mb-4">
+    <form method="GET" action="{{ route('admin.buku.index') }}" class="row g-3 align-items-end" id="bukuFilterForm">
+        <div class="col-lg-4">
+            <label for="q" class="form-label admin-form-label mb-1">Search</label>
+            <input
+                type="text"
+                id="q"
+                name="q"
+                value="{{ $search }}"
+                class="form-control"
+                placeholder="Cari judul, ISBN, pengarang, penerbit..."
+                autocomplete="off"
+            >
         </div>
-    </div>
-    <div class="admin-spotlight-card">
-        <h6><i class="fas fa-star me-2"></i>Buku Terbaru</h6>
-        <div class="admin-spotlight-list">
-            @foreach($buku->sortByDesc('created_at')->take(3) as $item)
-                <div class="admin-spotlight-item">
-                    <span class="text-truncate">{{ $item->judul }}</span>
-                    <small>{{ $item->jumlah }} stok</small>
-                </div>
-            @endforeach
+        <div class="col-lg-2">
+            <label for="kategori_id" class="form-label admin-form-label mb-1">Kategori</label>
+            <select id="kategori_id" name="kategori_id" class="form-select">
+                <option value="">Semua Kategori</option>
+                @foreach($kategoriOptions as $kategori)
+                    <option value="{{ $kategori->id }}" {{ (string) $kategoriId === (string) $kategori->id ? 'selected' : '' }}>
+                        {{ $kategori->nama }}
+                    </option>
+                @endforeach
+            </select>
         </div>
-    </div>
+        <div class="col-lg-2">
+            <label for="pengarang" class="form-label admin-form-label mb-1">Pengarang</label>
+            <select id="pengarang" name="pengarang" class="form-select">
+                <option value="">Semua</option>
+                @foreach($pengarangOptions as $pengarangItem)
+                    <option value="{{ $pengarangItem }}" {{ $pengarang === $pengarangItem ? 'selected' : '' }}>{{ $pengarangItem }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-lg-2">
+            <label for="penerbit" class="form-label admin-form-label mb-1">Penerbit</label>
+            <select id="penerbit" name="penerbit" class="form-select">
+                <option value="">Semua</option>
+                @foreach($penerbitOptions as $penerbitItem)
+                    <option value="{{ $penerbitItem }}" {{ $penerbit === $penerbitItem ? 'selected' : '' }}>{{ $penerbitItem }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-lg-1">
+            <label for="stok" class="form-label admin-form-label mb-1">Stok</label>
+            <select id="stok" name="stok" class="form-select">
+                <option value="">Semua</option>
+                <option value="tersedia" {{ $stok === 'tersedia' ? 'selected' : '' }}>Ada</option>
+                <option value="menipis" {{ $stok === 'menipis' ? 'selected' : '' }}>Menipis</option>
+                <option value="habis" {{ $stok === 'habis' ? 'selected' : '' }}>Habis</option>
+            </select>
+        </div>
+    </form>
 </div>
 
 <div class="card admin-card">
-    <div class="card-header admin-card-header">
-        <h5 class="mb-0">
-            <i class="fas fa-book me-2"></i>Daftar Buku
-        </h5>
-    </div>
-    <div class="card-body">
+    <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-striped table-hover mb-0 admin-table">
+            <table class="table table-hover mb-0 admin-table">
                 <thead>
                     <tr>
-                        <th>No</th>
+                        <th class="text-center" style="width: 60px;">No</th>
                         <th>Cover</th>
                         <th>Judul</th>
                         <th>Pengarang</th>
                         <th>Kategori</th>
                         <th>Penerbit</th>
-                        <th>Jumlah</th>
-                        <th>Aksi</th>
+                        <th class="text-center">Jumlah</th>
+                        <th class="text-center" style="width: 120px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($buku as $index => $item)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
+                            <td class="text-center">{{ ($buku->firstItem() ?? 1) + $index }}</td>
                             <td>
                                 @if($item->cover && file_exists(public_path('covers/' . $item->cover)))
                                     <img src="{{ asset('covers/' . $item->cover) }}" alt="{{ $item->judul }}" style="width: 50px; height: 70px; object-fit: cover;" class="rounded">
@@ -93,8 +118,8 @@
                                 @endif
                             </td>
                             <td>{{ $item->penerbit ?? '-' }}</td>
-                            <td>{{ $item->jumlah }}</td>
-                            <td>
+                            <td class="text-center">{{ $item->jumlah }}</td>
+                            <td class="text-center">
                                 <a href="{{ route('admin.buku.edit', $item->id) }}" class="btn btn-warning btn-sm admin-icon-btn">
                                     <i class="fas fa-edit"></i>
                                 </a>
@@ -109,7 +134,10 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center py-4">Tidak ada data buku</td>
+                            <td colspan="8" class="text-center py-5">
+                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <p class="text-muted mb-0">Tidak ada data buku</p>
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -117,4 +145,43 @@
         </div>
     </div>
 </div>
+
+<div class="mt-3">
+    {{ $buku->links() }}
+</div>
+
+<script>
+    (function () {
+        const form = document.getElementById('bukuFilterForm');
+        if (!form) return;
+
+        const searchInput = form.querySelector('#q');
+        const selects = form.querySelectorAll('select');
+        let searchTimer = null;
+
+        const submitForm = function () {
+            if (searchTimer) {
+                clearTimeout(searchTimer);
+                searchTimer = null;
+            }
+            form.submit();
+        };
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                if (searchTimer) {
+                    clearTimeout(searchTimer);
+                }
+
+                searchTimer = setTimeout(function () {
+                    submitForm();
+                }, 400);
+            });
+        }
+
+        selects.forEach(function (selectEl) {
+            selectEl.addEventListener('change', submitForm);
+        });
+    })();
+</script>
 @endsection

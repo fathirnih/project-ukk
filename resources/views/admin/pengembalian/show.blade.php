@@ -8,8 +8,8 @@
 
 @section('content')
 <div class="mb-3">
-    <a href="{{ route('admin.pengembalian.index') }}" class="btn btn-secondary admin-action-btn">
-        <i class="fas fa-arrow-left me-1"></i> Kembali
+    <a href="{{ route('admin.pengembalian.index') }}" class="admin-back-link">
+        <i class="fas fa-arrow-left me-1"></i>Kembali ke daftar
     </a>
 </div>
 
@@ -30,25 +30,6 @@
     <div class="admin-mini-stat">
         <span>Total Qty</span>
         <strong>{{ $pengembalian->peminjaman->detailPeminjamans->sum('jumlah') }}</strong>
-    </div>
-</div>
-
-<div class="admin-content-grid mb-4">
-    <div class="admin-spotlight-card">
-        <h6><i class="fas fa-timeline me-2"></i>Timeline Pengembalian</h6>
-        <div class="admin-spotlight-list">
-            <div class="admin-spotlight-item"><span>Diajukan</span><small>{{ $pengembalian->created_at->format('d/m/Y H:i') }}</small></div>
-            <div class="admin-spotlight-item"><span>Tanggal Pengajuan</span><small>{{ $pengembalian->tanggal_pengajuan->format('d/m/Y') }}</small></div>
-            <div class="admin-spotlight-item"><span>Dikembalikan</span><small>{{ $pengembalian->tanggal_dikembalikan?->format('d/m/Y') ?? '-' }}</small></div>
-        </div>
-    </div>
-    <div class="admin-spotlight-card">
-        <h6><i class="fas fa-user-check me-2"></i>Profil Anggota</h6>
-        <div class="admin-spotlight-list">
-            <div class="admin-spotlight-item"><span>Nama</span><small>{{ $pengembalian->peminjaman->anggota->nama }}</small></div>
-            <div class="admin-spotlight-item"><span>NISN</span><small>{{ $pengembalian->peminjaman->anggota->nisn }}</small></div>
-            <div class="admin-spotlight-item"><span>Status</span><small>{{ $pengembalian->status }}</small></div>
-        </div>
     </div>
 </div>
 

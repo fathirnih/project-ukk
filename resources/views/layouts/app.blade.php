@@ -9,6 +9,7 @@
 <body class="app-layout">
     <!-- Navbar Component -->
     @include('partials.navbar')
+    @include('partials.flash-message')
 
     <!-- Main Content -->
     <main>

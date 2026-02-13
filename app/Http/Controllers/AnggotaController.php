@@ -7,14 +7,58 @@ use Illuminate\Http\Request;
 
 class AnggotaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $anggota = Anggota::all();
+        $search = trim((string) $request->get('q', ''));
+        $kelas = trim((string) $request->get('kelas', ''));
+        $alamatStatus = trim((string) $request->get('alamat', ''));
+
+        $query = Anggota::query();
+
+        if ($search !== '') {
+            $query->where(function ($subQuery) use ($search) {
+                $subQuery->where('nisn', 'like', "%{$search}%")
+                    ->orWhere('nama', 'like', "%{$search}%")
+                    ->orWhere('kelas', 'like', "%{$search}%")
+                    ->orWhere('alamat', 'like', "%{$search}%");
+            });
+        }
+
+        if ($kelas !== '') {
+            $query->where('kelas', $kelas);
+        }
+
+        if ($alamatStatus === 'lengkap') {
+            $query->whereNotNull('alamat')->where('alamat', '!=', '');
+        } elseif ($alamatStatus === 'kosong') {
+            $query->where(function ($subQuery) {
+                $subQuery->whereNull('alamat')->orWhere('alamat', '');
+            });
+        }
+
+        $anggota = $query->orderBy('nama')->paginate(10)->withQueryString();
+        $kelasOptions = Anggota::whereNotNull('kelas')
+            ->where('kelas', '!=', '')
+            ->distinct()
+            ->orderBy('kelas')
+            ->pluck('kelas');
+        $filteredTotal = $anggota->total();
+
         $totalAnggota = Anggota::count();
         $denganKelas = Anggota::whereNotNull('kelas')->where('kelas', '!=', '')->count();
         $tanpaAlamat = Anggota::whereNull('alamat')->orWhere('alamat', '')->count();
 
-        return view('admin.anggota.index', compact('anggota', 'totalAnggota', 'denganKelas', 'tanpaAlamat'));
+        return view('admin.anggota.index', compact(
+            'anggota',
+            'totalAnggota',
+            'denganKelas',
+            'tanpaAlamat',
+            'kelasOptions',
+            'filteredTotal',
+            'search',
+            'kelas',
+            'alamatStatus'
+        ));
     }
 
     public function create()

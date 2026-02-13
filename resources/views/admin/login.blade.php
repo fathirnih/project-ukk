@@ -21,12 +21,10 @@
             </div>
             <div class="col-lg-7 admin-login-form-panel">
                 <div class="admin-login-card">
+                    @include('partials.flash-message')
                     <h4 class="text-center mb-4">
                         <i class="fas fa-lock me-2"></i>Admin Login
                     </h4>
-                    @if(session('error'))
-                        <div class="alert alert-danger">{{ session('error') }}</div>
-                    @endif
                     <form action="{{ route('admin.login.post') }}" method="POST">
                         @csrf
                         <div class="mb-3">

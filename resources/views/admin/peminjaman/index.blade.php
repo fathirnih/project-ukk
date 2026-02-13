@@ -31,48 +31,48 @@
     </div>
 </div>
 
-<div class="admin-content-grid mb-4">
-    <div class="admin-spotlight-card">
-        <h6><i class="fas fa-list-check me-2"></i>Prioritas Hari Ini</h6>
-        <div class="admin-spotlight-list">
-            <div class="admin-spotlight-item"><span>Permintaan menunggu</span><small>{{ $statPending }}</small></div>
-            <div class="admin-spotlight-item"><span>Butuh tindak lanjut</span><small>{{ $statDisetujui }}</small></div>
+<div class="admin-form-shell mb-4">
+    <form method="GET" action="{{ route('admin.peminjaman.index') }}" class="row g-3 align-items-end" id="peminjamanSearchForm">
+        <input type="hidden" name="status" value="{{ $status }}">
+        <div class="col-lg-12">
+            <label for="q" class="form-label admin-form-label mb-1">Search</label>
+            <input
+                type="text"
+                id="q"
+                name="q"
+                class="form-control"
+                value="{{ $search }}"
+                placeholder="Cari nama anggota, NISN, status, atau tanggal..."
+                autocomplete="off"
+            >
         </div>
-    </div>
-    <div class="admin-spotlight-card">
-        <h6><i class="fas fa-link me-2"></i>Pintasan</h6>
-        <div class="d-flex gap-2 flex-wrap">
-            <a class="btn btn-outline-primary admin-action-btn" href="{{ route('admin.peminjaman.index', ['status' => 'pending']) }}">Pending</a>
-            <a class="btn btn-outline-primary admin-action-btn" href="{{ route('admin.peminjaman.index', ['status' => 'disetujui']) }}">Disetujui</a>
-            <a class="btn btn-outline-primary admin-action-btn" href="{{ route('admin.pengembalian.index', ['status' => 'pending']) }}">Pengembalian</a>
-        </div>
-    </div>
+    </form>
 </div>
 
 <div class="mb-4">
     <ul class="nav nav-tabs admin-tabs border-0">
         <li class="nav-item">
-            <a class="nav-link {{ $status == 'all' ? 'active' : '' }}" href="{{ route('admin.peminjaman.index') }}">
+            <a class="nav-link {{ $status == 'all' ? 'active' : '' }}" href="{{ route('admin.peminjaman.index', ['q' => $search]) }}">
                 <i class="fas fa-list me-1"></i> Semua
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ $status == 'pending' ? 'active' : '' }}" href="{{ route('admin.peminjaman.index', ['status' => 'pending']) }}">
+            <a class="nav-link {{ $status == 'pending' ? 'active' : '' }}" href="{{ route('admin.peminjaman.index', ['status' => 'pending', 'q' => $search]) }}">
                 <i class="fas fa-clock me-1"></i> Menunggu Persetujuan
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ $status == 'disetujui' ? 'active' : '' }}" href="{{ route('admin.peminjaman.index', ['status' => 'disetujui']) }}">
+            <a class="nav-link {{ $status == 'disetujui' ? 'active' : '' }}" href="{{ route('admin.peminjaman.index', ['status' => 'disetujui', 'q' => $search]) }}">
                 <i class="fas fa-check-circle me-1"></i> Sedang Dipinjam
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ $status == 'ditolak' ? 'active' : '' }}" href="{{ route('admin.peminjaman.index', ['status' => 'ditolak']) }}">
+            <a class="nav-link {{ $status == 'ditolak' ? 'active' : '' }}" href="{{ route('admin.peminjaman.index', ['status' => 'ditolak', 'q' => $search]) }}">
                 <i class="fas fa-times-circle me-1"></i> Ditolak
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ $status == 'selesai' ? 'active' : '' }}" href="{{ route('admin.peminjaman.index', ['status' => 'selesai']) }}">
+            <a class="nav-link {{ $status == 'selesai' ? 'active' : '' }}" href="{{ route('admin.peminjaman.index', ['status' => 'selesai', 'q' => $search]) }}">
                 <i class="fas fa-check-double me-1"></i> Selesai
             </a>
         </li>
@@ -88,7 +88,6 @@
                         <th class="text-center" style="width: 50px;">No</th>
                         <th>Anggota</th>
                         <th>Tanggal Pinjam</th>
-                        <th>Tanggal Kembali</th>
                         <th class="text-center">Status Pinjam</th>
                         <th class="text-center" style="width: 120px;">Aksi</th>
                     </tr>
@@ -96,18 +95,12 @@
                 <tbody>
                     @forelse($peminjamans as $index => $peminjaman)
                         <tr>
-                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td class="text-center">{{ ($peminjamans->firstItem() ?? 1) + $index }}</td>
                             <td>
                                 <div class="fw-bold">{{ $peminjaman->anggota->nama }}</div>
                                 <small class="text-muted">{{ $peminjaman->anggota->nisn }}</small>
                             </td>
                             <td>{{ $peminjaman->tanggal_pinjam->format('d/m/Y') }}</td>
-                            <td>
-                                {{ $peminjaman->tanggal_kembali->format('d/m/Y') }}
-                                @if($peminjaman->tanggal_kembali < now()->toDateString() && $peminjaman->status_pinjam == 'disetujui' && !$peminjaman->pengembalian)
-                                    <span class="badge bg-danger ms-1">Terlambat</span>
-                                @endif
-                            </td>
                             <td class="text-center">
                                 @if($peminjaman->status_pinjam == 'pending')
                                     <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>Menunggu</span>
@@ -125,7 +118,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-5">
+                            <td colspan="5" class="text-center py-5">
                                 <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
                                 <p class="text-muted mb-0">Tidak ada data peminjaman</p>
                             </td>
@@ -140,4 +133,25 @@
 <div class="mt-3">
     {{ $peminjamans->links() }}
 </div>
+
+<script>
+    (function () {
+        const form = document.getElementById('peminjamanSearchForm');
+        if (!form) return;
+
+        const searchInput = form.querySelector('#q');
+        if (!searchInput) return;
+
+        let timer = null;
+        searchInput.addEventListener('input', function () {
+            if (timer) {
+                clearTimeout(timer);
+            }
+
+            timer = setTimeout(function () {
+                form.submit();
+            }, 400);
+        });
+    })();
+</script>
 @endsection

@@ -17,6 +17,7 @@
         'collapseId' => 'memberNavbarContent',
         'showMemberToggle' => true,
     ])
+    @include('partials.flash-message')
 
     <!-- Main Layout -->
     <div class="d-flex member-shell">
