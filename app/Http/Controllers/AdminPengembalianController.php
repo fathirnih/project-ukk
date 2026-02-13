@@ -15,11 +15,27 @@ class AdminPengembalianController extends Controller
     public function index(Request $request)
     {
         $status = $request->get('status', 'all');
+        $search = trim((string) $request->get('q', ''));
         $statPending = Pengembalian::where('status', 'pending_admin')->count();
         $statDitolak = Pengembalian::where('status', 'ditolak')->count();
         $statSelesai = Pengembalian::where('status', 'selesai')->count();
         
         $query = Pengembalian::with('peminjaman.anggota', 'peminjaman.detailPeminjamans.buku');
+
+        if ($search !== '') {
+            $query->where(function ($subQuery) use ($search) {
+                if (is_numeric($search)) {
+                    $subQuery->orWhere('id', (int) $search);
+                }
+
+                $subQuery->orWhere('status', 'like', "%{$search}%")
+                    ->orWhere('tanggal_pengajuan', 'like', "%{$search}%")
+                    ->orWhereHas('peminjaman.anggota', function ($anggotaQuery) use ($search) {
+                        $anggotaQuery->where('nama', 'like', "%{$search}%")
+                            ->orWhere('nisn', 'like', "%{$search}%");
+                    });
+            });
+        }
         
         if ($status === 'pending') {
             $query->where('status', 'pending_admin');
@@ -29,11 +45,12 @@ class AdminPengembalianController extends Controller
             $query->where('status', 'selesai');
         }
         
-        $pengembalian = $query->orderBy('created_at', 'desc')->paginate(10);
+        $pengembalian = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
         
         return view('admin.pengembalian.index', compact(
             'pengembalian',
             'status',
+            'search',
             'statPending',
             'statDitolak',
             'statSelesai'

@@ -28,7 +28,7 @@ class PengembalianController extends Controller
                             ->whereDoesntHave('pengembalian')
                             ->get();
         
-        return view('pengembalian.index', compact('anggota', 'pinjamans'));
+        return view('anggota.pengembalian.index', compact('anggota', 'pinjamans'));
     }
 
     // Riwayat pengembalian anggota
@@ -51,7 +51,7 @@ class PengembalianController extends Controller
                             ->orderBy('created_at', 'desc')
                             ->paginate(10);
         
-        $response = response()->view('pengembalian.riwayat', compact('anggota', 'riwayat'));
+        $response = response()->view('anggota.pengembalian.riwayat', compact('anggota', 'riwayat'));
         $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
         $response->headers->set('Pragma', 'no-cache');
         $response->headers->set('Expires', '0');

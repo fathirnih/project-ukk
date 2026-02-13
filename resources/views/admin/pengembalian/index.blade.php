@@ -27,92 +27,146 @@
     </div>
 </div>
 
-<div class="admin-content-grid mb-4">
-    <div class="admin-spotlight-card">
-        <h6><i class="fas fa-triangle-exclamation me-2"></i>Perhatian</h6>
-        <div class="admin-spotlight-list">
-            <div class="admin-spotlight-item"><span>Menunggu verifikasi</span><small>{{ $statPending }}</small></div>
-            <div class="admin-spotlight-item"><span>Pengembalian ditolak</span><small>{{ $statDitolak }}</small></div>
-        </div>
-    </div>
-    <div class="admin-spotlight-card">
-        <h6><i class="fas fa-link me-2"></i>Pintasan</h6>
-        <div class="d-flex gap-2 flex-wrap">
-            <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary admin-action-btn">
-                <i class="fas fa-arrow-left me-1"></i>Kembali
-            </a>
-            <a href="{{ route('admin.pengembalian.index', ['status' => 'pending']) }}" class="btn btn-outline-primary admin-action-btn">Menunggu</a>
-            <a href="{{ route('admin.pengembalian.index', ['status' => 'selesai']) }}" class="btn btn-outline-primary admin-action-btn">Selesai</a>
-        </div>
+<div class="admin-tabs-shell mb-4">
+    <div class="admin-filter-row">
+        <ul class="nav nav-tabs admin-tabs border-0">
+            <li class="nav-item">
+                <a class="nav-link {{ $status == 'all' ? 'active' : '' }}" href="{{ route('admin.pengembalian.index', ['q' => $search]) }}">
+                    <i class="fas fa-list me-1"></i> Semua
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ $status == 'pending' ? 'active' : '' }}" href="{{ route('admin.pengembalian.index', ['status' => 'pending', 'q' => $search]) }}">
+                    <i class="fas fa-clock me-1"></i> Menunggu
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ $status == 'ditolak' ? 'active' : '' }}" href="{{ route('admin.pengembalian.index', ['status' => 'ditolak', 'q' => $search]) }}">
+                    <i class="fas fa-times-circle me-1"></i> Ditolak
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ $status == 'selesai' ? 'active' : '' }}" href="{{ route('admin.pengembalian.index', ['status' => 'selesai', 'q' => $search]) }}">
+                    <i class="fas fa-check-double me-1"></i> Selesai
+                </a>
+            </li>
+        </ul>
+
+        <form method="GET" action="{{ route('admin.pengembalian.index') }}" id="pengembalianSearchForm" class="admin-inline-search-form">
+            <input type="hidden" name="status" value="{{ $status }}">
+            <div class="admin-search-wrap">
+                <i class="fas fa-magnifying-glass"></i>
+                <input
+                    type="text"
+                    id="q"
+                    name="q"
+                    class="form-control admin-search-input"
+                    value="{{ $search }}"
+                    placeholder="Cari..."
+                    autocomplete="off"
+                >
+                <button
+                    type="button"
+                    class="admin-search-clear {{ $search !== '' ? '' : 'd-none' }}"
+                    id="pengembalianSearchClear"
+                    aria-label="Hapus pencarian"
+                >
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
 <div class="card admin-card">
-    <div class="card-header admin-card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Daftar Pengembalian</h5>
-        <div>
-            <a href="{{ route('admin.pengembalian.index', ['status' => 'pending']) }}" class="btn btn-sm btn-light {{ $status == 'pending' ? 'bg-white text-primary' : '' }}">
-                Menunggu
-            </a>
-            <a href="{{ route('admin.pengembalian.index', ['status' => 'ditolak']) }}" class="btn btn-sm btn-light {{ $status == 'ditolak' ? 'bg-white text-primary' : '' }}">
-                Ditolak
-            </a>
-            <a href="{{ route('admin.pengembalian.index', ['status' => 'selesai']) }}" class="btn btn-sm btn-light {{ $status == 'selesai' ? 'bg-white text-primary' : '' }}">
-                Selesai
-            </a>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 admin-table">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width: 50px;">No</th>
+                        <th style="width: 100px;">Kode</th>
+                        <th>Anggota</th>
+                        <th>Tgl Pengajuan</th>
+                        <th class="text-center" style="width: 120px;">Status</th>
+                        <th class="text-center" style="width: 120px;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($pengembalian as $index => $item)
+                        <tr>
+                            <td class="text-center">{{ ($pengembalian->firstItem() ?? 1) + $index }}</td>
+                            <td class="text-center">#{{ str_pad($item->id, 5, '0', STR_PAD_LEFT) }}</td>
+                            <td>{{ $item->peminjaman->anggota->nama }}</td>
+                            <td>{{ $item->tanggal_pengajuan->format('d/m/Y') }}</td>
+                            <td class="text-center">
+                                @if($item->status == 'pending_admin')
+                                    <span class="badge bg-info text-dark">Menunggu</span>
+                                @elseif($item->status == 'ditolak')
+                                    <span class="badge bg-danger">Ditolak</span>
+                                @else
+                                    <span class="badge bg-success">Selesai</span>
+                                @endif
+                            </td>
+                            <td class="text-center">
+                                <a href="{{ route('admin.pengembalian.show', $item->id) }}" class="btn btn-sm btn-primary admin-icon-btn">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <p class="text-muted mb-0">Tidak ada data pengembalian</p>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
-    <div class="card-body">
-        @if($pengembalian->count() > 0)
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover admin-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 50px">No</th>
-                            <th style="width: 100px">Kode</th>
-                            <th>Anggota</th>
-                            <th>Tgl Pengajuan</th>
-                            <th style="100px">Status</th>
-                            <th style="100px">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($pengembalian as $index => $item)
-                            <tr>
-                                <td class="text-center">{{ $index + 1 }}</td>
-                                <td class="text-center">#{{ str_pad($item->id, 5, '0', STR_PAD_LEFT) }}</td>
-                                <td>{{ $item->peminjaman->anggota->nama }}</td>
-                                <td>{{ $item->tanggal_pengajuan->format('d/m/Y') }}</td>
-                                <td class="text-center">
-                                    @if($item->status == 'pending_admin')
-                                        <span class="badge bg-info text-dark">Menunggu</span>
-                                    @elseif($item->status == 'ditolak')
-                                        <span class="badge bg-danger">Ditolak</span>
-                                    @else
-                                        <span class="badge bg-success">Selesai</span>
-                                    @endif
-                                </td>
-                                <td class="text-center">
-                                    <a href="{{ route('admin.pengembalian.show', $item->id) }}" class="btn btn-sm btn-primary admin-icon-btn">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="d-flex justify-content-center mt-3">
-                {{ $pengembalian->links() }}
-            </div>
-        @else
-            <div class="text-center py-5">
-                <i class="fas fa-undo fa-4x text-muted mb-3"></i>
-                <h5>Tidak ada data pengembalian</h5>
-                <p class="text-muted">Belum ada pengembalian dengan status ini.</p>
-            </div>
-        @endif
-    </div>
 </div>
+
+<div class="mt-3">
+    {{ $pengembalian->links() }}
+</div>
+
+<script>
+    (function () {
+        const form = document.getElementById('pengembalianSearchForm');
+        if (!form) return;
+
+        const searchInput = form.querySelector('#q');
+        const clearButton = document.getElementById('pengembalianSearchClear');
+        if (!searchInput) return;
+
+        let timer = null;
+        const toggleClear = function () {
+            if (!clearButton) return;
+            clearButton.classList.toggle('d-none', searchInput.value.trim() === '');
+        };
+
+        searchInput.addEventListener('input', function () {
+            if (timer) {
+                clearTimeout(timer);
+            }
+
+            toggleClear();
+            timer = setTimeout(function () {
+                form.submit();
+            }, 400);
+        });
+
+        if (clearButton) {
+            clearButton.addEventListener('click', function () {
+                searchInput.value = '';
+                toggleClear();
+                form.submit();
+            });
+        }
+
+        toggleClear();
+    })();
+</script>
 @endsection

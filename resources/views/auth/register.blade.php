@@ -6,9 +6,9 @@
     <title>Daftar - Perpustakaan Digital</title>
     @vite(['resources/css/site-theme.css', 'resources/js/app.js'])
 </head>
-<body class="auth-layout">
+<body class="auth-layout auth-layout-register">
     <div class="container auth-shell">
-        <div class="row g-0 auth-frame overflow-hidden">
+        <div class="row g-0 auth-frame auth-frame-register">
             <div class="col-lg-5 d-none d-lg-flex auth-brand-panel">
                 <div>
                     <span class="auth-pill mb-3 d-inline-flex">Registrasi Anggota</span>
@@ -20,19 +20,13 @@
                 </div>
             </div>
             <div class="col-lg-7 auth-form-panel">
-                <div class="auth-form-card p-4 p-md-5 mx-auto">
+                <div class="auth-form-card auth-register-card p-4 p-md-4 mx-auto">
+                    @include('partials.flash-message')
                     <div class="text-center mb-4">
                         <i class="fas fa-user-plus fa-3x text-success mb-3"></i>
                         <h4 class="fw-bold mb-1">Daftar Anggota Baru</h4>
                         <p class="text-muted mb-0">Perpustakaan Digital</p>
                     </div>
-
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
 
                     <form action="{{ route('register.process') }}" method="POST">
                         @csrf

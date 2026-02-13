@@ -8,7 +8,8 @@
 </head>
 <body class="app-layout">
     <!-- Navbar Component -->
-    @include('components.navbar')
+    @include('partials.navbar')
+    @include('partials.flash-message')
 
     <!-- Main Content -->
     <main>

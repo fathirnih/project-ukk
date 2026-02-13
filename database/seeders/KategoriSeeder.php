@@ -35,10 +35,29 @@ class KategoriSeeder extends Seeder
                 'nama' => 'Agama',
                 'keterangan' => 'Buku-buku tentang keagamaan dan spiritual',
             ],
+            [
+                'nama' => 'Teknologi',
+                'keterangan' => 'Buku-buku tentang komputer, internet, dan inovasi teknologi',
+            ],
+            [
+                'nama' => 'Bisnis',
+                'keterangan' => 'Buku-buku tentang kewirausahaan, manajemen, dan ekonomi',
+            ],
+            [
+                'nama' => 'Biografi',
+                'keterangan' => 'Kisah hidup tokoh inspiratif dari berbagai bidang',
+            ],
+            [
+                'nama' => 'Kesehatan',
+                'keterangan' => 'Buku-buku tentang kesehatan, kebugaran, dan pola hidup sehat',
+            ],
         ];
 
         foreach ($kategori as $kat) {
-            Kategori::create($kat);
+            Kategori::updateOrCreate(
+                ['nama' => $kat['nama']],
+                $kat
+            );
         }
     }
 }

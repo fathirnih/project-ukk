@@ -7,6 +7,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const collapsed = localStorage.getItem("sidebarCollapsed") === "true";
         sidebar.classList.toggle("collapsed", collapsed);
         document.documentElement.classList.toggle("member-sidebar-collapsed", collapsed);
+
+        window.requestAnimationFrame(() => {
+            sidebar.classList.add("member-sidebar-anim");
+        });
     }
 
     initMemberAutoRedirect();
@@ -16,11 +20,17 @@ document.addEventListener("DOMContentLoaded", () => {
 window.toggleSidebar = function toggleSidebar() {
     const sidebar = document.getElementById("sidebarContainer");
     if (!sidebar) return;
+    if (sidebar.classList.contains("is-toggling")) return;
 
+    sidebar.classList.add("is-toggling");
     sidebar.classList.toggle("collapsed");
     const collapsed = sidebar.classList.contains("collapsed");
     document.documentElement.classList.toggle("member-sidebar-collapsed", collapsed);
     localStorage.setItem("sidebarCollapsed", String(collapsed));
+
+    window.setTimeout(() => {
+        sidebar.classList.remove("is-toggling");
+    }, 320);
 };
 
 window.toggleMobileSidebar = function toggleMobileSidebar() {

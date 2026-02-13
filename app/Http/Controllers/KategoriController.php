@@ -7,14 +7,42 @@ use Illuminate\Http\Request;
 
 class KategoriController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $kategori = Kategori::withCount('buku')->get();
+        $search = trim((string) $request->get('q', ''));
+        $status = trim((string) $request->get('status', ''));
+
+        $query = Kategori::withCount('buku');
+
+        if ($search !== '') {
+            $query->where(function ($subQuery) use ($search) {
+                $subQuery->where('nama', 'like', "%{$search}%")
+                    ->orWhere('keterangan', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status === 'terpakai') {
+            $query->has('buku');
+        } elseif ($status === 'kosong') {
+            $query->doesntHave('buku');
+        }
+
+        $kategori = $query->orderBy('nama')->paginate(10)->withQueryString();
+        $filteredTotal = $kategori->total();
+
         $totalKategori = Kategori::count();
         $totalBukuTerkategori = \App\Models\Buku::whereNotNull('kategori_id')->count();
         $kategoriKosong = Kategori::doesntHave('buku')->count();
 
-        return view('admin.kategori.index', compact('kategori', 'totalKategori', 'totalBukuTerkategori', 'kategoriKosong'));
+        return view('admin.kategori.index', compact(
+            'kategori',
+            'totalKategori',
+            'totalBukuTerkategori',
+            'kategoriKosong',
+            'filteredTotal',
+            'search',
+            'status'
+        ));
     }
 
     public function create()

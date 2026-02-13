@@ -15,14 +15,34 @@ class AdminPeminjamanController extends Controller
     public function index(Request $request)
     {
         $status = $request->get('status', 'all');
+        $search = trim((string) $request->get('q', ''));
         $statPending = Peminjaman::where('status_pinjam', 'pending')->count();
         $statDisetujui = Peminjaman::where('status_pinjam', 'disetujui')->count();
         $statDitolak = Peminjaman::where('status_pinjam', 'ditolak')->count();
-        $statSelesai = Peminjaman::whereHas('pengembalian', function ($q) {
-            $q->where('status', 'selesai');
-        })->count();
+        $statSelesai = Peminjaman::where('status_pinjam', 'disetujui')
+            ->whereHas('detailPeminjamans')
+            ->whereDoesntHave('detailPeminjamans', function ($q) {
+                $q->where('status', '!=', 'dikembalikan');
+            })
+            ->count();
         
         $query = Peminjaman::with('anggota', 'detailPeminjamans.buku', 'pengembalian');
+
+        if ($search !== '') {
+            $query->where(function ($subQuery) use ($search) {
+                if (is_numeric($search)) {
+                    $subQuery->orWhere('id', (int) $search);
+                }
+
+                $subQuery->orWhere('status_pinjam', 'like', "%{$search}%")
+                    ->orWhere('tanggal_pinjam', 'like', "%{$search}%")
+                    ->orWhere('tanggal_kembali', 'like', "%{$search}%")
+                    ->orWhereHas('anggota', function ($anggotaQuery) use ($search) {
+                        $anggotaQuery->where('nama', 'like', "%{$search}%")
+                            ->orWhere('nisn', 'like', "%{$search}%");
+                    });
+            });
+        }
         
         if ($status === 'pending') {
             $query->where('status_pinjam', 'pending');
@@ -35,16 +55,19 @@ class AdminPeminjamanController extends Controller
                 $q->where('status', 'pending_admin');
             });
         } elseif ($status === 'selesai') {
-            $query->whereHas('pengembalian', function ($q) {
-                $q->where('status', 'selesai');
-            });
+            $query->where('status_pinjam', 'disetujui')
+                ->whereHas('detailPeminjamans')
+                ->whereDoesntHave('detailPeminjamans', function ($q) {
+                    $q->where('status', '!=', 'dikembalikan');
+                });
         }
         
-        $peminjamans = $query->orderBy('created_at', 'desc')->paginate(10);
+        $peminjamans = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
         
         return view('admin.peminjaman.index', compact(
             'peminjamans',
             'status',
+            'search',
             'statPending',
             'statDisetujui',
             'statDitolak',
