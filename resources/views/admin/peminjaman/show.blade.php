@@ -13,19 +13,25 @@
     </a>
 </div>
 
-<div class="row">
-    <div class="col-md-4">
+<div class="row g-4">
+    <div class="col-lg-4">
         <div class="card admin-card mb-3">
             <div class="card-header admin-card-header">
                 <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informasi Peminjaman</h5>
             </div>
             <div class="card-body">
+                <div class="admin-index-overview mb-3">
+                    <div class="admin-mini-stat">
+                        <span>Kode</span>
+                        <strong>#{{ str_pad($peminjaman->id, 5, '0', STR_PAD_LEFT) }}</strong>
+                    </div>
+                    <div class="admin-mini-stat">
+                        <span>Total Buku</span>
+                        <strong>{{ $peminjaman->detailPeminjamans->count() }}</strong>
+                    </div>
+                </div>
                 <div class="admin-detail-info">
                 <table class="table table-borderless mb-0">
-                    <tr>
-                        <td class="fw-bold" style="width: 100px;">Kode</td>
-                        <td>: #{{ str_pad($peminjaman->id, 5, '0', STR_PAD_LEFT) }}</td>
-                    </tr>
                     <tr>
                         <td class="fw-bold">Anggota</td>
                         <td>: {{ $peminjaman->anggota->nama }}</td>
@@ -119,7 +125,7 @@
         @endif
     </div>
 
-    <div class="col-md-8">
+    <div class="col-lg-8">
         <div class="card admin-card">
             <div class="card-header admin-card-header">
                 <h5 class="mb-0"><i class="fas fa-book me-2"></i>Buku yang Dipinjam</h5>

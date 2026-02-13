@@ -47,10 +47,11 @@ class AdminController extends Controller
         $totalDipinjam = DetailPeminjaman::where('status', 'dipinjam')->sum('jumlah');
 
         $pendingPeminjaman = Peminjaman::where('status_pinjam', 'pending')->count();
+        $ditolakPeminjaman = Peminjaman::where('status_pinjam', 'ditolak')->count();
         $pendingPengembalian = Pengembalian::where('status', 'pending_admin')->count();
         $ditolakPengembalian = Pengembalian::where('status', 'ditolak')->count();
 
-        $latestBooks = Buku::with('kategori')->latest()->take(6)->get();
+        $latestBooks = Buku::with('kategori')->latest()->take(4)->get();
         $lowStockBooks = Buku::where('jumlah', '<=', 3)->orderBy('jumlah')->take(5)->get();
 
         return view('admin.dashboard', compact(
@@ -59,6 +60,7 @@ class AdminController extends Controller
             'totalKategori',
             'totalDipinjam',
             'pendingPeminjaman',
+            'ditolakPeminjaman',
             'pendingPengembalian',
             'ditolakPengembalian',
             'latestBooks',

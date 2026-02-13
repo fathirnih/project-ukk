@@ -27,47 +27,55 @@
     </div>
 </div>
 
-<div class="admin-form-shell mb-4">
-    <form method="GET" action="{{ route('admin.pengembalian.index') }}" class="row g-3 align-items-end" id="pengembalianSearchForm">
-        <input type="hidden" name="status" value="{{ $status }}">
-        <div class="col-lg-12">
-            <label for="q" class="form-label admin-form-label mb-1">Search</label>
-            <input
-                type="text"
-                id="q"
-                name="q"
-                class="form-control"
-                value="{{ $search }}"
-                placeholder="Cari nama anggota, NISN, status, atau tanggal pengajuan..."
-                autocomplete="off"
-            >
-        </div>
-    </form>
-</div>
+<div class="admin-tabs-shell mb-4">
+    <div class="admin-filter-row">
+        <ul class="nav nav-tabs admin-tabs border-0">
+            <li class="nav-item">
+                <a class="nav-link {{ $status == 'all' ? 'active' : '' }}" href="{{ route('admin.pengembalian.index', ['q' => $search]) }}">
+                    <i class="fas fa-list me-1"></i> Semua
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ $status == 'pending' ? 'active' : '' }}" href="{{ route('admin.pengembalian.index', ['status' => 'pending', 'q' => $search]) }}">
+                    <i class="fas fa-clock me-1"></i> Menunggu
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ $status == 'ditolak' ? 'active' : '' }}" href="{{ route('admin.pengembalian.index', ['status' => 'ditolak', 'q' => $search]) }}">
+                    <i class="fas fa-times-circle me-1"></i> Ditolak
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ $status == 'selesai' ? 'active' : '' }}" href="{{ route('admin.pengembalian.index', ['status' => 'selesai', 'q' => $search]) }}">
+                    <i class="fas fa-check-double me-1"></i> Selesai
+                </a>
+            </li>
+        </ul>
 
-<div class="mb-4">
-    <ul class="nav nav-tabs admin-tabs border-0">
-        <li class="nav-item">
-            <a class="nav-link {{ $status == 'all' ? 'active' : '' }}" href="{{ route('admin.pengembalian.index', ['q' => $search]) }}">
-                <i class="fas fa-list me-1"></i> Semua
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ $status == 'pending' ? 'active' : '' }}" href="{{ route('admin.pengembalian.index', ['status' => 'pending', 'q' => $search]) }}">
-                <i class="fas fa-clock me-1"></i> Menunggu
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ $status == 'ditolak' ? 'active' : '' }}" href="{{ route('admin.pengembalian.index', ['status' => 'ditolak', 'q' => $search]) }}">
-                <i class="fas fa-times-circle me-1"></i> Ditolak
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ $status == 'selesai' ? 'active' : '' }}" href="{{ route('admin.pengembalian.index', ['status' => 'selesai', 'q' => $search]) }}">
-                <i class="fas fa-check-double me-1"></i> Selesai
-            </a>
-        </li>
-    </ul>
+        <form method="GET" action="{{ route('admin.pengembalian.index') }}" id="pengembalianSearchForm" class="admin-inline-search-form">
+            <input type="hidden" name="status" value="{{ $status }}">
+            <div class="admin-search-wrap">
+                <i class="fas fa-magnifying-glass"></i>
+                <input
+                    type="text"
+                    id="q"
+                    name="q"
+                    class="form-control admin-search-input"
+                    value="{{ $search }}"
+                    placeholder="Cari..."
+                    autocomplete="off"
+                >
+                <button
+                    type="button"
+                    class="admin-search-clear {{ $search !== '' ? '' : 'd-none' }}"
+                    id="pengembalianSearchClear"
+                    aria-label="Hapus pencarian"
+                >
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <div class="card admin-card">
@@ -130,18 +138,35 @@
         if (!form) return;
 
         const searchInput = form.querySelector('#q');
+        const clearButton = document.getElementById('pengembalianSearchClear');
         if (!searchInput) return;
 
         let timer = null;
+        const toggleClear = function () {
+            if (!clearButton) return;
+            clearButton.classList.toggle('d-none', searchInput.value.trim() === '');
+        };
+
         searchInput.addEventListener('input', function () {
             if (timer) {
                 clearTimeout(timer);
             }
 
+            toggleClear();
             timer = setTimeout(function () {
                 form.submit();
             }, 400);
         });
+
+        if (clearButton) {
+            clearButton.addEventListener('click', function () {
+                searchInput.value = '';
+                toggleClear();
+                form.submit();
+            });
+        }
+
+        toggleClear();
     })();
 </script>
 @endsection
