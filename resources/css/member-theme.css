@@ -528,6 +528,19 @@ body.member-layout {
     padding: 0.15rem;
 }
 
+.member-book-filter-form {
+    margin-bottom: 0.85rem !important;
+}
+
+.member-book-filter-input {
+    min-height: 34px;
+    font-size: 0.83rem;
+}
+
+.member-book-filter-search {
+    margin-left: auto;
+}
+
 #mobileSidebar {
     position: fixed;
     inset: 0;

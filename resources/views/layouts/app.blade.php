@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Perpustakaan Digital')</title>
+    <script>
+        (function () {
+            try {
+                const keysToRemove = [];
+                for (let i = 0; i < sessionStorage.length; i++) {
+                    const key = sessionStorage.key(i);
+                    if (!key) continue;
+                    if (key === 'member_peminjaman_selected_ids' || key === 'member_peminjaman_qty' || key.startsWith('member_peminjaman_selected_ids_') || key.startsWith('member_peminjaman_qty_')) {
+                        keysToRemove.push(key);
+                    }
+                }
+                keysToRemove.forEach(function (key) {
+                    sessionStorage.removeItem(key);
+                });
+            } catch (e) {}
+        })();
+    </script>
     @vite(['resources/css/site-theme.css', 'resources/js/app.js'])
 </head>
 <body class="app-layout">

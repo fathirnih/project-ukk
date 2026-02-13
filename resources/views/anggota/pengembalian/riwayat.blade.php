@@ -29,7 +29,7 @@
                                     <div>
                                         <div class="fw-bold">#{{ str_pad($pengembalian->id, 5, '0', STR_PAD_LEFT) }}</div>
                                         <div class="member-record-meta">
-                                            <i class="fas fa-calendar-plus me-1"></i>{{ $pengembalian->tanggal_pengajuan->format('d/m/Y') }}
+                                            <i class="fas fa-calendar-check me-1"></i>{{ $pengembalian->peminjaman->tanggal_kembali->format('d/m/Y') }}
                                         </div>
                                     </div>
                                     <div>
@@ -64,6 +64,15 @@
                                     </div>
                                     <div class="col-lg-4">
                                         <div class="d-grid gap-2">
+                                            @if($pengembalian->status == 'selesai')
+                                                <div class="small text-muted">Total Denda</div>
+                                                <div class="fw-semibold text-danger">
+                                                    Rp {{ number_format($pengembalian->total_denda ?? 0, 0, ',', '.') }}
+                                                </div>
+                                                <div class="small text-muted">
+                                                    {{ $pengembalian->hari_terlambat ?? 0 }} hari x Rp {{ number_format($pengembalian->denda_per_hari ?? 0, 0, ',', '.') }}
+                                                </div>
+                                            @endif
                                             @if($pengembalian->status == 'pending_admin')
                                                 <span class="text-muted small">Menunggu...</span>
                                             @elseif($pengembalian->status == 'ditolak')

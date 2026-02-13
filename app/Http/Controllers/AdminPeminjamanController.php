@@ -7,6 +7,7 @@ use App\Models\Peminjaman;
 use App\Models\DetailPeminjaman;
 use App\Models\Pengembalian;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class AdminPeminjamanController extends Controller
@@ -130,7 +131,15 @@ class AdminPeminjamanController extends Controller
             return redirect()->route('admin.pengembalian.index')->with('error', 'Pengembalian tidak ditemukan.');
         }
         
-        DB::transaction(function () use ($peminjaman, $pengembalian) {
+        $tanggalDikembalikan = Carbon::today();
+        $tanggalHarusKembali = Carbon::parse($peminjaman->tanggal_kembali)->startOfDay();
+        $hariTerlambat = $tanggalDikembalikan->greaterThan($tanggalHarusKembali)
+            ? $tanggalHarusKembali->diffInDays($tanggalDikembalikan)
+            : 0;
+        $dendaPerHari = (int) config('perpustakaan.denda_per_hari', 1000);
+        $totalDenda = $hariTerlambat * $dendaPerHari;
+
+        DB::transaction(function () use ($peminjaman, $pengembalian, $tanggalDikembalikan, $hariTerlambat, $dendaPerHari, $totalDenda) {
             foreach ($peminjaman->detailPeminjamans as $detail) {
                 $buku = Buku::find($detail->buku_id);
                 if ($buku) {
@@ -139,13 +148,16 @@ class AdminPeminjamanController extends Controller
                 
                 $detail->update([
                     'status' => 'dikembalikan',
-                    'tanggal_dikembalikan' => now()->toDateString(),
+                    'tanggal_dikembalikan' => $tanggalDikembalikan->toDateString(),
                 ]);
             }
             
             $pengembalian->update([
                 'status' => 'selesai',
-                'tanggal_dikembalikan' => now()->toDateString(),
+                'tanggal_dikembalikan' => $tanggalDikembalikan->toDateString(),
+                'hari_terlambat' => $hariTerlambat,
+                'denda_per_hari' => $dendaPerHari,
+                'total_denda' => $totalDenda,
             ]);
         });
 
@@ -172,5 +184,78 @@ class AdminPeminjamanController extends Controller
         ]);
 
         return redirect()->route('admin.pengembalian.index')->with('success', 'Pengembalian telah ditolak.');
+    }
+
+    // Create - Tampilkan form tambah
+    public function create()
+    {
+        $anggotas = \App\Models\Anggota::orderBy('nama')->get();
+        return view('admin.peminjaman.create', compact('anggotas'));
+    }
+
+    // Store - Simpan data baru
+    public function store(Request $request)
+    {
+        $request->validate([
+            'anggota_id' => 'required|exists:anggotas,id',
+            'tanggal_pinjam' => 'required|date',
+            'tanggal_kembali' => 'required|date|after_or_equal:tanggal_pinjam',
+        ]);
+
+        $peminjaman = Peminjaman::create([
+            'anggota_id' => $request->anggota_id,
+            'tanggal_pinjam' => $request->tanggal_pinjam,
+            'tanggal_kembali' => $request->tanggal_kembali,
+            'status_pinjam' => $request->status_pinjam ?? 'pending',
+            'catatan' => $request->catatan,
+        ]);
+
+        return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman berhasil ditambahkan.');
+    }
+
+    // Edit - Tampilkan form edit
+    public function edit($id)
+    {
+        $peminjaman = Peminjaman::findOrFail($id);
+        $anggotas = \App\Models\Anggota::orderBy('nama')->get();
+        return view('admin.peminjaman.edit', compact('peminjaman', 'anggotas'));
+    }
+
+    // Update - Update data
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'anggota_id' => 'required|exists:anggotas,id',
+            'tanggal_pinjam' => 'required|date',
+            'tanggal_kembali' => 'required|date|after_or_equal:tanggal_pinjam',
+        ]);
+
+        $peminjaman = Peminjaman::findOrFail($id);
+        $peminjaman->update([
+            'anggota_id' => $request->anggota_id,
+            'tanggal_pinjam' => $request->tanggal_pinjam,
+            'tanggal_kembali' => $request->tanggal_kembali,
+            'status_pinjam' => $request->status_pinjam ?? 'pending',
+            'catatan' => $request->catatan,
+        ]);
+
+        return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman berhasil diperbarui.');
+    }
+
+    // Destroy - Hapus data
+    public function destroy($id)
+    {
+        $peminjaman = Peminjaman::findOrFail($id);
+        
+        // Hapus detail peminjaman terlebih dahulu
+        DetailPeminjaman::where('peminjaman_id', $id)->delete();
+        
+        // Hapus pengembalian terkait
+        Pengembalian::where('peminjaman_id', $id)->delete();
+        
+        // Hapus peminjaman
+        $peminjaman->delete();
+        
+        return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman berhasil dihapus.');
     }
 }

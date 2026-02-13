@@ -22,7 +22,53 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('peminjaman.store') }}" method="POST" id="peminjamanForm">
+                <form method="GET" action="{{ route('peminjaman.index') }}" id="memberBookFilterForm" class="mb-4 member-book-filter-form">
+                    <div class="row g-2 align-items-center member-book-filter-row">
+                        <div class="col-md-3">
+                            <select name="kategori_id" id="memberFilterKategori" class="form-select form-select-sm member-book-filter-input">
+                                <option value="">Semua kategori</option>
+                                @foreach($kategoris as $kategori)
+                                    <option value="{{ $kategori->id }}" {{ (string) $kategoriId === (string) $kategori->id ? 'selected' : '' }}>
+                                        {{ $kategori->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="pengarang" id="memberFilterPengarang" class="form-select form-select-sm member-book-filter-input">
+                                <option value="">Semua pengarang</option>
+                                @foreach($pengarangList as $itemPengarang)
+                                    <option value="{{ $itemPengarang }}" {{ $pengarang === $itemPengarang ? 'selected' : '' }}>
+                                        {{ $itemPengarang }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="penerbit" id="memberFilterPenerbit" class="form-select form-select-sm member-book-filter-input">
+                                <option value="">Semua penerbit</option>
+                                @foreach($penerbitList as $itemPenerbit)
+                                    <option value="{{ $itemPenerbit }}" {{ $penerbit === $itemPenerbit ? 'selected' : '' }}>
+                                        {{ $itemPenerbit }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-4 ms-md-auto member-book-filter-search">
+                            <input
+                                type="text"
+                                name="q"
+                                id="memberFilterSearch"
+                                class="form-control form-control-sm member-book-filter-input"
+                                placeholder="Cari judul, ISBN, pengarang, penerbit..."
+                                value="{{ $search }}"
+                                autocomplete="off"
+                            >
+                        </div>
+                    </div>
+                </form>
+
+                <form action="{{ route('peminjaman.store') }}" method="POST" id="peminjamanForm" data-anggota-id="{{ $anggota->id }}">
                     @csrf
                     
                     <div class="mb-3">
@@ -89,6 +135,11 @@
                                 </div>
                             @endforelse
                         </div>
+                        @if(method_exists($bukus, 'hasPages') && $bukus->hasPages())
+                            <div class="d-flex justify-content-center mt-3">
+                                {{ $bukus->links() }}
+                            </div>
+                        @endif
                     </div>
 
                     <div class="row mb-3">

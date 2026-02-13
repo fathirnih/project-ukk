@@ -80,7 +80,11 @@ body.app-layout footer {
 .app-footer {
     color: #f8fbff;
     background:
-        radial-gradient(circle at 0% 0%, rgba(80, 146, 222, 0.22), transparent 32%),
+        radial-gradient(
+            circle at 0% 0%,
+            rgba(80, 146, 222, 0.22),
+            transparent 32%
+        ),
         linear-gradient(135deg, #0f2f4d 0%, #153d61 55%, #1d527f 100%);
     border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
@@ -141,7 +145,9 @@ body.app-layout footer {
     justify-content: center;
     text-decoration: none;
     background: rgba(255, 255, 255, 0.08);
-    transition: transform 0.2s ease, background 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
 }
 
 .app-footer-social a:hover {
@@ -151,8 +157,16 @@ body.app-layout footer {
 
 body.auth-layout {
     background:
-        radial-gradient(circle at 0% 0%, rgba(31, 91, 143, 0.12), transparent 34%),
-        radial-gradient(circle at 100% 100%, rgba(18, 57, 93, 0.1), transparent 40%),
+        radial-gradient(
+            circle at 0% 0%,
+            rgba(31, 91, 143, 0.12),
+            transparent 34%
+        ),
+        radial-gradient(
+            circle at 100% 100%,
+            rgba(18, 57, 93, 0.1),
+            transparent 40%
+        ),
         #f4f8fc;
     min-height: 100vh;
     display: flex;
@@ -277,8 +291,16 @@ body.auth-layout.auth-layout-register .auth-form-card .btn {
 
 body.admin-login-layout {
     background:
-        radial-gradient(circle at 0% 0%, rgba(70, 99, 163, 0.18), transparent 36%),
-        radial-gradient(circle at 100% 100%, rgba(46, 69, 121, 0.2), transparent 42%),
+        radial-gradient(
+            circle at 0% 0%,
+            rgba(70, 99, 163, 0.18),
+            transparent 36%
+        ),
+        radial-gradient(
+            circle at 100% 100%,
+            rgba(46, 69, 121, 0.2),
+            transparent 42%
+        ),
         linear-gradient(135deg, #dce6f7 0%, #ecf1fb 100%);
     min-height: 100vh;
     display: flex;
@@ -343,8 +365,16 @@ body.admin-login-layout {
 
 body.admin-layout {
     background:
-        radial-gradient(circle at 0% 0%, rgba(63, 136, 255, 0.2), transparent 30%),
-        radial-gradient(circle at 100% 100%, rgba(13, 62, 117, 0.2), transparent 38%),
+        radial-gradient(
+            circle at 0% 0%,
+            rgba(63, 136, 255, 0.2),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 100% 100%,
+            rgba(13, 62, 117, 0.2),
+            transparent 38%
+        ),
         linear-gradient(135deg, #e8eef7 0%, #f2f6fb 100%);
 }
 
@@ -352,7 +382,11 @@ body.admin-layout {
     width: 270px;
     min-height: 100vh;
     background:
-        radial-gradient(circle at 20% -10%, rgba(95, 161, 255, 0.26), transparent 38%),
+        radial-gradient(
+            circle at 20% -10%,
+            rgba(95, 161, 255, 0.26),
+            transparent 38%
+        ),
         linear-gradient(180deg, #0a1f35 0%, #102f4d 45%, #133a5f 100%);
     border-right: 1px solid rgba(255, 255, 255, 0.18);
     box-shadow: 0 22px 45px rgba(7, 21, 36, 0.35);
@@ -603,21 +637,21 @@ body.admin-layout {
 .admin-mini-stat {
     background: linear-gradient(135deg, #ffffff 0%, #f6fbff 100%);
     border: 1px solid #d3e3f5;
-    border-radius: 0.95rem;
-    padding: 0.85rem 0.95rem;
-    box-shadow: 0 10px 20px rgba(17, 36, 59, 0.08);
+    border-radius: 0.5rem;
+    padding: 0.35rem 0.5rem;
+    box-shadow: 0 2px 8px rgba(17, 36, 59, 0.06);
 }
 
 .admin-mini-stat span {
     display: block;
     color: #4d6987;
-    font-size: 0.8rem;
-    margin-bottom: 0.25rem;
+    font-size: 0.7rem;
+    margin-bottom: 0.1rem;
 }
 
 .admin-mini-stat strong {
     color: #0f3456;
-    font-size: 1.38rem;
+    font-size: 1rem;
     line-height: 1.1;
 }
 
@@ -656,7 +690,11 @@ body.admin-layout {
     padding: 1.45rem;
     color: #ffffff;
     background:
-        radial-gradient(circle at 85% -10%, rgba(255, 255, 255, 0.2), transparent 30%),
+        radial-gradient(
+            circle at 85% -10%,
+            rgba(255, 255, 255, 0.2),
+            transparent 30%
+        ),
         linear-gradient(135deg, #0f3659 0%, #1d5a8f 55%, #2b76b6 100%);
     box-shadow: 0 20px 34px rgba(13, 43, 73, 0.24);
 }
@@ -712,7 +750,10 @@ body.admin-layout {
     text-decoration: none;
     color: #173f63;
     font-weight: 700;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
 }
 
 .admin-feature-card i {
@@ -822,10 +863,16 @@ body.admin-layout {
     color: #2f4a64;
     background: linear-gradient(135deg, #f7fbff 0%, #edf4fc 100%);
     border: 1px solid #d4e2f1;
-    border-radius: 0.7rem;
-    margin-right: 0.4rem;
-    margin-bottom: 0.4rem;
-    padding: 0.5rem 0.9rem;
+    border-radius: 0.4rem;
+    margin-right: 0.25rem;
+    margin-bottom: 0.25rem;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+}
+
+.admin-tabs .nav-link i {
+    font-size: 0.75rem;
+    margin-right: 0.25rem;
 }
 
 .admin-tabs .nav-link:hover {
@@ -876,7 +923,11 @@ body.admin-layout {
     border: 1px solid #d5e3f3;
     border-radius: 1rem;
     background:
-        radial-gradient(circle at 85% 10%, rgba(77, 146, 223, 0.14), transparent 35%),
+        radial-gradient(
+            circle at 85% 10%,
+            rgba(77, 146, 223, 0.14),
+            transparent 35%
+        ),
         linear-gradient(135deg, #f7fbff 0%, #eef6ff 100%);
     padding: 1rem 1.05rem;
     margin-bottom: 1rem;
@@ -963,7 +1014,9 @@ body.admin-layout {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s ease, color 0.2s ease;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
 }
 
 .admin-search-clear:hover {
@@ -973,9 +1026,9 @@ body.admin-layout {
 
 .admin-tabs-shell {
     border: 1px solid #d7e4f2;
-    border-radius: 0.95rem;
+    border-radius: 0.5rem;
     background: linear-gradient(135deg, #ffffff 0%, #f5faff 100%);
-    padding: 0.7rem 0.75rem 0.35rem;
+    padding: 0.35rem 0.5rem 0.2rem;
 }
 
 .admin-filter-row {
@@ -991,12 +1044,36 @@ body.admin-layout {
 }
 
 .admin-inline-search-form {
-    flex: 0 0 280px;
-    min-width: 220px;
+    flex: 0 0 180px;
+    min-width: 140px;
 }
 
 .admin-inline-search-form .admin-search-input {
-    min-height: 40px;
+    min-height: 30px;
+    font-size: 0.8rem;
+}
+
+.admin-filter-row-pengembalian .admin-tabs {
+    flex: 1 1 460px;
+    min-width: 320px;
+}
+
+.admin-action-btn-compact {
+    padding: 0.32rem 0.7rem;
+    font-size: 0.82rem;
+}
+
+.admin-action-btn-compact i {
+    font-size: 0.78rem;
+}
+
+.admin-action-btn-tight {
+    padding: 0.3rem 0.58rem;
+    font-size: 0.76rem;
+}
+
+.admin-action-btn-tight i {
+    font-size: 0.72rem;
 }
 
 .admin-form-actions {
@@ -1047,6 +1124,7 @@ body.admin-layout {
     .admin-content-grid {
         grid-template-columns: 1fr;
     }
+
 }
 
 .home-hero {
@@ -1141,7 +1219,9 @@ body.admin-layout {
 .home-book-card {
     border-radius: 1rem;
     box-shadow: 0 10px 24px rgba(17, 36, 59, 0.11);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .home-book-card:hover {
@@ -1193,7 +1273,9 @@ body.admin-layout {
 }
 
 .home-category-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .home-category-card:hover {
@@ -1249,14 +1331,20 @@ body.admin-layout {
 .collection-book-card {
     border-radius: 1rem;
     box-shadow: 0 10px 24px rgba(17, 36, 59, 0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .collection-filter-card {
     border: 1px solid #d3e2f2;
     border-radius: 1rem;
     background:
-        radial-gradient(circle at 92% -20%, rgba(66, 141, 224, 0.18), transparent 40%),
+        radial-gradient(
+            circle at 92% -20%,
+            rgba(66, 141, 224, 0.18),
+            transparent 40%
+        ),
         linear-gradient(135deg, #ffffff 0%, #f5faff 100%);
     box-shadow: 0 14px 28px rgba(17, 36, 59, 0.09);
     overflow: hidden;
@@ -1492,7 +1580,9 @@ body.admin-layout {
 }
 
 .about-stat-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .about-stat-card:hover {
@@ -1531,8 +1621,16 @@ body.admin-layout {
 
 body.access-layout {
     background:
-        radial-gradient(circle at 0% 0%, rgba(31, 91, 143, 0.16), transparent 34%),
-        radial-gradient(circle at 100% 100%, rgba(18, 57, 93, 0.14), transparent 40%),
+        radial-gradient(
+            circle at 0% 0%,
+            rgba(31, 91, 143, 0.16),
+            transparent 34%
+        ),
+        radial-gradient(
+            circle at 100% 100%,
+            rgba(18, 57, 93, 0.14),
+            transparent 40%
+        ),
         #f3f7fc;
 }
 
@@ -1655,7 +1753,9 @@ body.access-layout {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s ease, color 0.2s ease;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
 }
 
 .flash-close:hover {
