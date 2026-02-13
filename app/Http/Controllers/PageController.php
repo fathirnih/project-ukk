@@ -50,6 +50,6 @@ class PageController extends Controller
         if (Session::has('anggota_id')) {
             $anggota = Anggota::find(Session::get('anggota_id'));
         }
-        return view('anggota', compact('anggota'));
+        return view('anggota.index', compact('anggota'));
     }
 }

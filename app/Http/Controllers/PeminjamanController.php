@@ -27,7 +27,7 @@ class PeminjamanController extends Controller
         
         $bukus = Buku::where('jumlah', '>', 0)->get();
         
-        return view('peminjaman.index', compact('anggota', 'bukus'));
+        return view('anggota.peminjaman.index', compact('anggota', 'bukus'));
     }
 
     // Simpan ajuan pinjam
@@ -128,7 +128,7 @@ class PeminjamanController extends Controller
                             ->orderBy('created_at', 'desc')
                             ->paginate(10);
         
-        $response = response()->view('peminjaman.riwayat-peminjaman', compact('anggota', 'riwayat'));
+        $response = response()->view('anggota.peminjaman.riwayat-peminjaman', compact('anggota', 'riwayat'));
         $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
         $response->headers->set('Pragma', 'no-cache');
         $response->headers->set('Expires', '0');
