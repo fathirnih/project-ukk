@@ -19,9 +19,12 @@ class AdminPeminjamanController extends Controller
         $statPending = Peminjaman::where('status_pinjam', 'pending')->count();
         $statDisetujui = Peminjaman::where('status_pinjam', 'disetujui')->count();
         $statDitolak = Peminjaman::where('status_pinjam', 'ditolak')->count();
-        $statSelesai = Peminjaman::whereHas('pengembalian', function ($q) {
-            $q->where('status', 'selesai');
-        })->count();
+        $statSelesai = Peminjaman::where('status_pinjam', 'disetujui')
+            ->whereHas('detailPeminjamans')
+            ->whereDoesntHave('detailPeminjamans', function ($q) {
+                $q->where('status', '!=', 'dikembalikan');
+            })
+            ->count();
         
         $query = Peminjaman::with('anggota', 'detailPeminjamans.buku', 'pengembalian');
 
@@ -52,9 +55,11 @@ class AdminPeminjamanController extends Controller
                 $q->where('status', 'pending_admin');
             });
         } elseif ($status === 'selesai') {
-            $query->whereHas('pengembalian', function ($q) {
-                $q->where('status', 'selesai');
-            });
+            $query->where('status_pinjam', 'disetujui')
+                ->whereHas('detailPeminjamans')
+                ->whereDoesntHave('detailPeminjamans', function ($q) {
+                    $q->where('status', '!=', 'dikembalikan');
+                });
         }
         
         $peminjamans = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();

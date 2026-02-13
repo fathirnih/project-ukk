@@ -97,7 +97,7 @@
             </div>
         @endif
 
-        @if($peminjaman->status_pinjam == 'disetujui' && $peminjaman->status_kembali == 'pending_admin')
+        @if($peminjaman->status_pinjam == 'disetujui' && $peminjaman->pengembalian && $peminjaman->pengembalian->status == 'pending_admin')
             <div class="card admin-card mb-3">
                 <div class="card-header admin-card-header">
                     <h5 class="mb-0"><i class="fas fa-undo me-2"></i>Konfirmasi Pengembalian</h5>
