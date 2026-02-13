@@ -150,8 +150,12 @@ body.member-layout {
     background: linear-gradient(180deg, var(--sidebar-start) 0%, var(--sidebar-end) 100%);
     border-right: 1px solid rgba(255, 255, 255, 0.14);
     box-shadow: var(--shadow-lg);
-    transition: width 0.3s ease;
+    transition: none;
     overflow: hidden;
+}
+
+.member-sidebar.member-sidebar-anim {
+    transition: width 0.3s ease;
 }
 
 .member-sidebar.collapsed {

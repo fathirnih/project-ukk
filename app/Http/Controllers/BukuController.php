@@ -3,20 +3,86 @@
 namespace App\Http\Controllers;
 
 use App\Models\Buku;
+use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
 class BukuController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $buku = Buku::all();
+        $search = trim((string) $request->get('q', ''));
+        $kategoriId = trim((string) $request->get('kategori_id', ''));
+        $pengarang = trim((string) $request->get('pengarang', ''));
+        $penerbit = trim((string) $request->get('penerbit', ''));
+        $stok = trim((string) $request->get('stok', ''));
+
+        $query = Buku::with('kategori');
+
+        if ($search !== '') {
+            $query->where(function ($subQuery) use ($search) {
+                $subQuery->where('judul', 'like', "%{$search}%")
+                    ->orWhere('isbn', 'like', "%{$search}%")
+                    ->orWhere('pengarang', 'like', "%{$search}%")
+                    ->orWhere('penerbit', 'like', "%{$search}%")
+                    ->orWhere('deskripsi', 'like', "%{$search}%");
+            });
+        }
+
+        if ($kategoriId !== '') {
+            $query->where('kategori_id', $kategoriId);
+        }
+
+        if ($pengarang !== '') {
+            $query->where('pengarang', $pengarang);
+        }
+
+        if ($penerbit !== '') {
+            $query->where('penerbit', $penerbit);
+        }
+
+        if ($stok === 'tersedia') {
+            $query->where('jumlah', '>', 0);
+        } elseif ($stok === 'menipis') {
+            $query->whereBetween('jumlah', [1, 3]);
+        } elseif ($stok === 'habis') {
+            $query->where('jumlah', '<=', 0);
+        }
+
+        $buku = $query->orderBy('judul')->paginate(10)->withQueryString();
+        $kategoriOptions = Kategori::orderBy('nama')->get();
+        $pengarangOptions = Buku::whereNotNull('pengarang')
+            ->where('pengarang', '!=', '')
+            ->distinct()
+            ->orderBy('pengarang')
+            ->pluck('pengarang');
+        $penerbitOptions = Buku::whereNotNull('penerbit')
+            ->where('penerbit', '!=', '')
+            ->distinct()
+            ->orderBy('penerbit')
+            ->pluck('penerbit');
+        $filteredTotal = $buku->total();
+
         $totalBuku = Buku::count();
         $stokMenipis = Buku::where('jumlah', '<=', 3)->count();
         $tanpaCover = Buku::whereNull('cover')->orWhere('cover', '')->count();
 
-        return view('admin.buku.index', compact('buku', 'totalBuku', 'stokMenipis', 'tanpaCover'));
+        return view('admin.buku.index', compact(
+            'buku',
+            'totalBuku',
+            'stokMenipis',
+            'tanpaCover',
+            'kategoriOptions',
+            'pengarangOptions',
+            'penerbitOptions',
+            'filteredTotal',
+            'search',
+            'kategoriId',
+            'pengarang',
+            'penerbit',
+            'stok'
+        ));
     }
 
     public function create()

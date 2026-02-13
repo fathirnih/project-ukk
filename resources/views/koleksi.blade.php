@@ -3,11 +3,6 @@
 @section('title', 'Koleksi Buku - Perpustakaan Digital')
 
 @section('content')
-@php
-    $kategoriAktif = \App\Models\Kategori::count();
-    $stokTersedia = $buku->where('jumlah', '>', 0)->count();
-@endphp
-
 <div class="container py-4">
     <div class="collection-hero mb-4">
         <div class="row align-items-center g-4">
@@ -27,7 +22,7 @@
                     <div class="col-6">
                         <div class="collection-hero-stat">
                             <span>Total Ditampilkan</span>
-                            <strong>{{ $buku->count() }}</strong>
+                            <strong>{{ $totalDitampilkan }}</strong>
                         </div>
                     </div>
                     <div class="col-6">
@@ -44,6 +39,70 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="collection-filter-card mb-4">
+        <div class="collection-filter-head d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div>
+                <h6 class="mb-1"><i class="fas fa-sliders me-2"></i>Pencarian Cerdas</h6>
+                <p class="mb-0">Ketik atau pilih filter, hasil akan otomatis diperbarui.</p>
+            </div>
+            <span class="collection-filter-chip">Realtime</span>
+        </div>
+        <div class="collection-filter-body">
+            <form method="GET" action="{{ route('koleksi') }}" id="koleksiFilterForm">
+                <div class="row g-3 align-items-end">
+                    <div class="col-lg-5">
+                        <label for="q" class="form-label mb-1">Cari Buku</label>
+                        <div class="collection-input-wrap">
+                            <i class="fas fa-magnifying-glass"></i>
+                            <input
+                                id="q"
+                                type="text"
+                                name="q"
+                                class="form-control collection-search-input"
+                                placeholder="Judul, ISBN, kategori, pengarang, penerbit, deskripsi..."
+                                value="{{ $search }}"
+                                autocomplete="off"
+                            >
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="kategori_id" class="form-label mb-1">Kategori</label>
+                        <select id="kategori_id" name="kategori_id" class="form-select collection-filter-select">
+                            <option value="">Semua Kategori</option>
+                            @foreach($kategoriOptions as $kategori)
+                                <option value="{{ $kategori->id }}" {{ (string) $kategoriId === (string) $kategori->id ? 'selected' : '' }}>
+                                    {{ $kategori->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <label for="pengarang" class="form-label mb-1">Pengarang</label>
+                        <select id="pengarang" name="pengarang" class="form-select collection-filter-select">
+                            <option value="">Semua Pengarang</option>
+                            @foreach($pengarangOptions as $pengarangItem)
+                                <option value="{{ $pengarangItem }}" {{ $pengarang === $pengarangItem ? 'selected' : '' }}>
+                                    {{ $pengarangItem }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <label for="penerbit" class="form-label mb-1">Penerbit</label>
+                        <select id="penerbit" name="penerbit" class="form-select collection-filter-select">
+                            <option value="">Semua Penerbit</option>
+                            @foreach($penerbitOptions as $penerbitItem)
+                                <option value="{{ $penerbitItem }}" {{ $penerbit === $penerbitItem ? 'selected' : '' }}>
+                                    {{ $penerbitItem }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -85,15 +144,62 @@
                 </div>
             @endforeach
         </div>
+        <div class="mt-4">
+            {{ $buku->links() }}
+        </div>
     @else
         <div class="text-center py-5 bg-light rounded-4 collection-empty">
             <i class="fas fa-book fa-5x text-muted mb-4"></i>
-            <h4 class="text-muted mb-3">Belum Ada Buku</h4>
-            <p class="text-muted mb-4">Koleksi buku sedang dalam pengembangan.</p>
-            <a href="{{ route('home') }}" class="btn btn-primary">
-                <i class="fas fa-home me-2"></i>Kembali ke Home
+            <h4 class="text-muted mb-3">Buku Tidak Ditemukan</h4>
+            <p class="text-muted mb-4">Coba ubah kata kunci atau filter yang Anda gunakan.</p>
+            <a href="{{ route('koleksi') }}" class="btn btn-primary">
+                <i class="fas fa-rotate-left me-2"></i>Tampilkan Semua Buku
             </a>
         </div>
     @endif
 </div>
+
+<script>
+    (function () {
+        const form = document.getElementById('koleksiFilterForm');
+        if (!form) return;
+
+        const searchInput = form.querySelector('#q');
+        const selects = form.querySelectorAll('select');
+        let searchTimer = null;
+
+        const submitForm = function () {
+            if (searchTimer) {
+                clearTimeout(searchTimer);
+                searchTimer = null;
+            }
+            form.submit();
+        };
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                if (searchTimer) {
+                    clearTimeout(searchTimer);
+                }
+
+                searchTimer = setTimeout(function () {
+                    submitForm();
+                }, 400);
+            });
+        }
+
+        selects.forEach(function (selectEl) {
+            selectEl.addEventListener('change', submitForm);
+        });
+
+        document.querySelectorAll('.pagination a').forEach(function (paginationLink) {
+            paginationLink.addEventListener('click', function () {
+                if (searchTimer) {
+                    clearTimeout(searchTimer);
+                    searchTimer = null;
+                }
+            });
+        });
+    })();
+</script>
 @endsection

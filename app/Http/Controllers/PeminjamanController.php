@@ -27,7 +27,7 @@ class PeminjamanController extends Controller
         
         $bukus = Buku::where('jumlah', '>', 0)->get();
         
-        return view('peminjaman.index', compact('anggota', 'bukus'));
+        return view('anggota.peminjaman.index', compact('anggota', 'bukus'));
     }
 
     // Simpan ajuan pinjam
@@ -39,6 +39,7 @@ class PeminjamanController extends Controller
         ]);
 
         $bukuIds = json_decode($request->buku_ids, true);
+        $bukuIds = array_values(array_unique(array_map('intval', (array) $bukuIds)));
         
         if (empty($bukuIds)) {
             return redirect()->route('peminjaman.index')->with('error', 'Pilih minimal satu buku!');
@@ -55,7 +56,6 @@ class PeminjamanController extends Controller
                 'tanggal_pinjam' => now()->toDateString(),
                 'tanggal_kembali' => $request->tanggal_kembali,
                 'status_pinjam' => 'pending',
-                'status_kembali' => 'pending',
                 'catatan' => $request->catatan ?? null,
             ]);
 
@@ -94,9 +94,25 @@ class PeminjamanController extends Controller
             return redirect()->route('peminjaman.riwayat')->with('error', 'Peminjaman tidak ditemukan atau belum disetujui.');
         }
 
-        // Cek apakah sudah ada pengembalian yang pending
-        if ($peminjaman->pengembalian && $peminjaman->pengembalian->status == 'pending_admin') {
-            return redirect()->route('peminjaman.riwayat')->with('error', 'Pengembalian sudah diajukan dan menunggu konfirmasi.');
+        // Pastikan masih ada item yang belum dikembalikan.
+        $masihDipinjam = $peminjaman->detailPeminjamans()->where('status', 'dipinjam')->exists();
+        if (!$masihDipinjam) {
+            return redirect()->route('peminjaman.riwayat')->with('error', 'Semua buku pada transaksi ini sudah dikembalikan.');
+        }
+
+        // Cegah duplikasi record pengembalian untuk satu transaksi peminjaman.
+        if ($peminjaman->pengembalian) {
+            if ($peminjaman->pengembalian->status == 'pending_admin') {
+                return redirect()->route('peminjaman.riwayat')->with('error', 'Pengembalian sudah diajukan dan menunggu konfirmasi.');
+            }
+
+            if ($peminjaman->pengembalian->status == 'ditolak') {
+                return redirect()->route('peminjaman.riwayat')->with('error', 'Pengembalian terakhir ditolak. Gunakan tombol "Ajukan Lagi".');
+            }
+
+            if ($peminjaman->pengembalian->status == 'selesai') {
+                return redirect()->route('peminjaman.riwayat')->with('error', 'Pengembalian untuk transaksi ini sudah selesai.');
+            }
         }
 
         // Buat record pengembalian baru
@@ -128,7 +144,7 @@ class PeminjamanController extends Controller
                             ->orderBy('created_at', 'desc')
                             ->paginate(10);
         
-        $response = response()->view('peminjaman.riwayat-peminjaman', compact('anggota', 'riwayat'));
+        $response = response()->view('anggota.peminjaman.riwayat-peminjaman', compact('anggota', 'riwayat'));
         $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
         $response->headers->set('Pragma', 'no-cache');
         $response->headers->set('Expires', '0');
