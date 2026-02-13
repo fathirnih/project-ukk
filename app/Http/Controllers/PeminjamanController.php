@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Buku;
 use App\Models\Anggota;
+use App\Models\Kategori;
 use App\Models\Peminjaman;
 use App\Models\DetailPeminjaman;
 use App\Models\Pengembalian;
@@ -14,7 +15,7 @@ use Illuminate\Support\Facades\Session;
 class PeminjamanController extends Controller
 {
     // Halaman ajuan pinjam untuk anggota
-    public function index()
+    public function index(Request $request)
     {
         $anggota = null;
         if (Session::has('anggota_id')) {
@@ -25,9 +26,61 @@ class PeminjamanController extends Controller
             return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
         }
         
-        $bukus = Buku::where('jumlah', '>', 0)->get();
+        $search = trim((string) $request->get('q', ''));
+        $kategoriId = $request->get('kategori_id');
+        $pengarang = trim((string) $request->get('pengarang', ''));
+        $penerbit = trim((string) $request->get('penerbit', ''));
+
+        $query = Buku::with('kategori')->where('jumlah', '>', 0);
+
+        if ($search !== '') {
+            $query->where(function ($subQuery) use ($search) {
+                $subQuery->where('judul', 'like', "%{$search}%")
+                    ->orWhere('isbn', 'like', "%{$search}%")
+                    ->orWhere('pengarang', 'like', "%{$search}%")
+                    ->orWhere('penerbit', 'like', "%{$search}%");
+            });
+        }
+
+        if (!empty($kategoriId)) {
+            $query->where('kategori_id', (int) $kategoriId);
+        }
+
+        if ($pengarang !== '') {
+            $query->where('pengarang', $pengarang);
+        }
+
+        if ($penerbit !== '') {
+            $query->where('penerbit', $penerbit);
+        }
+
+        $bukus = $query->orderBy('judul')->paginate(10)->withQueryString();
+
+        $kategoris = Kategori::orderBy('nama')->get(['id', 'nama']);
+        $pengarangList = Buku::where('jumlah', '>', 0)
+            ->whereNotNull('pengarang')
+            ->where('pengarang', '!=', '')
+            ->distinct()
+            ->orderBy('pengarang')
+            ->pluck('pengarang');
+        $penerbitList = Buku::where('jumlah', '>', 0)
+            ->whereNotNull('penerbit')
+            ->where('penerbit', '!=', '')
+            ->distinct()
+            ->orderBy('penerbit')
+            ->pluck('penerbit');
         
-        return view('anggota.peminjaman.index', compact('anggota', 'bukus'));
+        return view('anggota.peminjaman.index', compact(
+            'anggota',
+            'bukus',
+            'kategoris',
+            'pengarangList',
+            'penerbitList',
+            'search',
+            'kategoriId',
+            'pengarang',
+            'penerbit'
+        ));
     }
 
     // Simpan ajuan pinjam

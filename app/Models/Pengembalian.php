@@ -16,12 +16,18 @@ class Pengembalian extends Model
         'tanggal_pengajuan',
         'tanggal_dikembalikan',
         'status',
+        'hari_terlambat',
+        'denda_per_hari',
+        'total_denda',
         'catatan_penolakan',
     ];
 
     protected $casts = [
         'tanggal_pengajuan' => 'date',
         'tanggal_dikembalikan' => 'date',
+        'hari_terlambat' => 'integer',
+        'denda_per_hari' => 'integer',
+        'total_denda' => 'integer',
     ];
 
     public function peminjaman()

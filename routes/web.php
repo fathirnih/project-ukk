@@ -51,6 +51,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Peminjaman CRUD
         Route::get('/peminjaman', [AdminPeminjamanController::class, 'index'])->name('peminjaman.index');
+        Route::get('/peminjaman/create', [AdminPeminjamanController::class, 'create'])->name('peminjaman.create');
+        Route::post('/peminjaman', [AdminPeminjamanController::class, 'store'])->name('peminjaman.store');
+        Route::get('/peminjaman/{id}/edit', [AdminPeminjamanController::class, 'edit'])->name('peminjaman.edit');
+        Route::put('/peminjaman/{id}', [AdminPeminjamanController::class, 'update'])->name('peminjaman.update');
+        Route::delete('/peminjaman/{id}', [AdminPeminjamanController::class, 'destroy'])->name('peminjaman.destroy');
         Route::get('/peminjaman/{id}', [AdminPeminjamanController::class, 'show'])->name('peminjaman.show');
         Route::post('/peminjaman/{id}/setujui', [AdminPeminjamanController::class, 'setujui'])->name('peminjaman.setujui');
         Route::post('/peminjaman/{id}/tolak', [AdminPeminjamanController::class, 'tolak'])->name('peminjaman.tolak');
@@ -59,9 +64,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Pengembalian CRUD
         Route::get('/pengembalian', [AdminPengembalianController::class, 'index'])->name('pengembalian.index');
+        Route::get('/pengembalian/create', [AdminPengembalianController::class, 'create'])->name('pengembalian.create');
+        Route::post('/pengembalian', [AdminPengembalianController::class, 'store'])->name('pengembalian.store');
         Route::get('/pengembalian/{id}', [AdminPengembalianController::class, 'show'])->name('pengembalian.show');
+        Route::get('/pengembalian/{id}/edit', [AdminPengembalianController::class, 'edit'])->name('pengembalian.edit');
+        Route::put('/pengembalian/{id}', [AdminPengembalianController::class, 'update'])->name('pengembalian.update');
+        Route::delete('/pengembalian/{id}', [AdminPengembalianController::class, 'destroy'])->name('pengembalian.destroy');
         Route::post('/pengembalian/{id}/konfirmasi', [AdminPengembalianController::class, 'konfirmasi'])->name('pengembalian.konfirmasi');
         Route::post('/pengembalian/{id}/tolak', [AdminPengembalianController::class, 'tolak'])->name('pengembalian.tolak');
+        Route::post('/pengembalian/recalculate-denda', [AdminPengembalianController::class, 'recalculateDenda'])->name('pengembalian.recalculate-denda');
 
         // Buku CRUD
         Route::resource('buku', BukuController::class);

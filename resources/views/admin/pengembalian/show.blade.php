@@ -58,10 +58,22 @@
                         <td class="fw-bold">Tgl Pengajuan</td>
                         <td>: {{ $pengembalian->tanggal_pengajuan->format('d/m/Y') }}</td>
                     </tr>
-                    @if($pengembalian->tanggal_dikembalikan)
                     <tr>
-                        <td class="fw-bold">Tgl Dikembalikan</td>
-                        <td>: {{ $pengembalian->tanggal_dikembalikan->format('d/m/Y') }}</td>
+                        <td class="fw-bold">Tgl Kembali</td>
+                        <td>: {{ $pengembalian->peminjaman->tanggal_kembali->format('d/m/Y') }}</td>
+                    </tr>
+                    @if($pengembalian->status == 'selesai')
+                    <tr>
+                        <td class="fw-bold">Terlambat</td>
+                        <td>: {{ $pengembalian->hari_terlambat ?? 0 }} hari</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Denda/Hari</td>
+                        <td>: Rp {{ number_format($pengembalian->denda_per_hari ?? 0, 0, ',', '.') }}</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Total Denda</td>
+                        <td>: <span class="fw-semibold text-danger">Rp {{ number_format($pengembalian->total_denda ?? 0, 0, ',', '.') }}</span></td>
                     </tr>
                     @endif
                     <tr>
