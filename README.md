@@ -99,24 +99,4 @@ Akses aplikasi:
 - Website: `http://127.0.0.1:8000`
 - Admin login: `http://127.0.0.1:8000/admin/login`
 
-## Skenario Demo UKK (Disarankan)
-
-1. Login sebagai anggota
-2. Ajukan peminjaman 2 buku
-3. Login admin, setujui peminjaman
-4. Kembali ke anggota, ajukan pengembalian
-5. Login admin, konfirmasi pengembalian
-6. Tunjukkan perubahan status + stok buku
-
-## Catatan Penilaian
-
-Fokus penilaian biasanya pada:
-- Kesesuaian flow bisnis
-- Kebenaran relasi data
-- Validasi input dan integritas data
-- Konsistensi UI dan kemudahan penggunaan
-- Kemampuan menjelaskan implementasi saat presentasi
-
----
-
 Project ini dibuat untuk kebutuhan UKK SMK dan bisa dikembangkan lebih lanjut untuk skenario sekolah nyata.
