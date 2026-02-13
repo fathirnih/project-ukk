@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initMemberAutoRedirect();
     initPeminjamanForm();
+    initMemberBookFilter();
 });
 
 window.toggleSidebar = function toggleSidebar() {
@@ -72,13 +73,75 @@ function initPeminjamanForm() {
     const checkboxes = form.querySelectorAll(".buku-checkbox");
     const submitBtn = document.getElementById("submitBtn");
     const bukuIds = document.getElementById("bukuIds");
+    const anggotaId = String(form.dataset.anggotaId || "guest");
+    const selectedIdsStorageKey = `member_peminjaman_selected_ids_${anggotaId}`;
+    const qtyStorageKey = `member_peminjaman_qty_${anggotaId}`;
+    const legacySelectedIdsStorageKey = "member_peminjaman_selected_ids";
+    const legacyQtyStorageKey = "member_peminjaman_qty";
 
     if (!submitBtn || !bukuIds) return;
 
-    const updateFormState = () => {
-        const selectedIds = [];
+    // One-time migration cleanup from old global keys.
+    window.sessionStorage.removeItem(legacySelectedIdsStorageKey);
+    window.sessionStorage.removeItem(legacyQtyStorageKey);
 
+    const readSelectedIds = () => {
+        try {
+            const raw = window.sessionStorage.getItem(selectedIdsStorageKey);
+            const parsed = raw ? JSON.parse(raw) : [];
+            if (!Array.isArray(parsed)) return new Set();
+            return new Set(parsed.map((id) => String(id)));
+        } catch {
+            return new Set();
+        }
+    };
+
+    const readQtyMap = () => {
+        try {
+            const raw = window.sessionStorage.getItem(qtyStorageKey);
+            const parsed = raw ? JSON.parse(raw) : {};
+            if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+            return parsed;
+        } catch {
+            return {};
+        }
+    };
+
+    const persistState = (selectedIdsSet, qtyMap) => {
+        window.sessionStorage.setItem(
+            selectedIdsStorageKey,
+            JSON.stringify(Array.from(selectedIdsSet)),
+        );
+        window.sessionStorage.setItem(qtyStorageKey, JSON.stringify(qtyMap));
+    };
+
+    const selectedIdsSet = readSelectedIds();
+    const qtyMap = readQtyMap();
+
+    // Restore checked state for books rendered on current page.
+    checkboxes.forEach((checkbox) => {
+        const id = String(checkbox.dataset.id || "");
+        if (!id || !selectedIdsSet.has(id)) return;
+
+        checkbox.checked = true;
+
+        const item = checkbox.closest("[data-book-item]") || checkbox.closest("tr");
+        if (!item) return;
+        const jumlahInput = item.querySelector(".jumlah-input");
+        if (!jumlahInput) return;
+
+        const max = Number.parseInt(jumlahInput.dataset.max || "1", 10);
+        const savedQty = Number.parseInt(String(qtyMap[id] ?? "1"), 10);
+        const clampedQty = Number.isNaN(savedQty) ? 1 : Math.max(1, Math.min(savedQty, Number.isNaN(max) ? savedQty : max));
+        jumlahInput.value = String(clampedQty);
+        qtyMap[id] = clampedQty;
+    });
+
+    const updateFormState = () => {
         checkboxes.forEach((checkbox) => {
+            const id = String(checkbox.dataset.id || "");
+            if (!id) return;
+
             const item = checkbox.closest("[data-book-item]") || checkbox.closest("tr");
             if (!item) return;
 
@@ -87,11 +150,20 @@ function initPeminjamanForm() {
             const qtyWrap = jumlahInput.closest(".member-qty-wrap") || jumlahInput.closest("td");
 
             if (checkbox.checked) {
-                selectedIds.push(checkbox.dataset.id);
+                selectedIdsSet.add(id);
                 jumlahInput.disabled = false;
                 item.classList.add("is-active");
                 qtyWrap?.classList.add("is-active");
+
+                const max = Number.parseInt(jumlahInput.dataset.max || "1", 10);
+                let value = Number.parseInt(jumlahInput.value || "1", 10);
+                if (Number.isNaN(value) || value < 1) value = 1;
+                if (!Number.isNaN(max) && value > max) value = max;
+                jumlahInput.value = String(value);
+                qtyMap[id] = value;
             } else {
+                selectedIdsSet.delete(id);
+                delete qtyMap[id];
                 jumlahInput.disabled = true;
                 jumlahInput.value = 1;
                 item.classList.remove("is-active");
@@ -99,8 +171,9 @@ function initPeminjamanForm() {
             }
         });
 
-        bukuIds.value = JSON.stringify(selectedIds);
-        submitBtn.disabled = selectedIds.length === 0;
+        persistState(selectedIdsSet, qtyMap);
+        bukuIds.value = JSON.stringify(Array.from(selectedIdsSet));
+        submitBtn.disabled = selectedIdsSet.size === 0;
     };
 
     checkboxes.forEach((checkbox) => {
@@ -121,9 +194,49 @@ function initPeminjamanForm() {
 
     form.addEventListener("submit", (event) => {
         const selected = Array.from(checkboxes).filter((checkbox) => checkbox.checked);
-        if (selected.length === 0) {
+        if (selected.length === 0 && selectedIdsSet.size === 0) {
             event.preventDefault();
             window.alert("Pilih minimal satu buku!");
+            return;
         }
+
+        // Clear persisted selection after user submits a borrowing request.
+        window.sessionStorage.removeItem(selectedIdsStorageKey);
+        window.sessionStorage.removeItem(qtyStorageKey);
+        window.sessionStorage.removeItem(legacySelectedIdsStorageKey);
+        window.sessionStorage.removeItem(legacyQtyStorageKey);
+    });
+
+    updateFormState();
+}
+
+function initMemberBookFilter() {
+    const filterForm = document.getElementById("memberBookFilterForm");
+    if (!filterForm) return;
+
+    const searchInput = document.getElementById("memberFilterSearch");
+    const kategoriSelect = document.getElementById("memberFilterKategori");
+    const pengarangSelect = document.getElementById("memberFilterPengarang");
+    const penerbitSelect = document.getElementById("memberFilterPenerbit");
+
+    let debounceTimer = null;
+
+    if (searchInput) {
+        searchInput.addEventListener("input", () => {
+            if (debounceTimer) {
+                window.clearTimeout(debounceTimer);
+            }
+
+            debounceTimer = window.setTimeout(() => {
+                filterForm.submit();
+            }, 400);
+        });
+    }
+
+    [kategoriSelect, pengarangSelect, penerbitSelect].forEach((selectNode) => {
+        if (!selectNode) return;
+        selectNode.addEventListener("change", () => {
+            filterForm.submit();
+        });
     });
 }

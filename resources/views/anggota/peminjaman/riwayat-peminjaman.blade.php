@@ -1,4 +1,4 @@
-tangg@extends('layouts.member')
+@extends('layouts.member')
 
 @section('title', 'Riwayat Peminjaman - Perpustakaan Digital')
 
