@@ -200,6 +200,71 @@ body.auth-layout {
     max-width: 430px;
 }
 
+body.auth-layout.auth-layout-register {
+    display: block;
+    min-height: 100vh;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.auth-frame-register {
+    overflow: visible;
+}
+
+body.auth-layout.auth-layout-register .auth-shell {
+    max-width: 860px;
+}
+
+body.auth-layout.auth-layout-register .auth-form-panel {
+    align-items: flex-start;
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+}
+
+body.auth-layout.auth-layout-register .auth-frame {
+    border-radius: 0.9rem;
+}
+
+body.auth-layout.auth-layout-register .auth-brand-panel {
+    padding: 1.7rem;
+}
+
+body.auth-layout.auth-layout-register .auth-form-card {
+    max-width: 350px;
+    padding-top: 1.05rem !important;
+    padding-bottom: 1.05rem !important;
+}
+
+body.auth-layout.auth-layout-register .auth-form-card h4 {
+    font-size: 1.45rem;
+}
+
+body.auth-layout.auth-layout-register .auth-form-card .btn {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.auth-register-card {
+    max-width: 365px;
+}
+
+.auth-register-card .mb-3 {
+    margin-bottom: 0.45rem !important;
+}
+
+.auth-register-card textarea.form-control {
+    min-height: 60px;
+}
+
+@media (max-height: 760px) {
+    body.auth-layout.auth-layout-register {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+}
+
 @media (max-width: 991.98px) {
     .auth-frame {
         box-shadow: 0 10px 24px rgba(18, 57, 93, 0.12);
