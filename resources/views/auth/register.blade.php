@@ -23,7 +23,7 @@
                 <div class="auth-form-card auth-register-card p-4 p-md-4 mx-auto">
                     @include('partials.flash-message')
                     <div class="text-center mb-4">
-                        <i class="fas fa-user-plus fa-3x text-success mb-3"></i>
+                        <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
                         <h4 class="fw-bold mb-1">Daftar Anggota Baru</h4>
                         <p class="text-muted mb-0">Perpustakaan Digital</p>
                     </div>
@@ -46,14 +46,14 @@
                             <label for="alamat" class="form-label fw-bold">Alamat</label>
                             <textarea class="form-control" id="alamat" name="alamat" rows="3" placeholder="Alamat lengkap Anda">{{ old('alamat') }}</textarea>
                         </div>
-                        <button type="submit" class="btn btn-success w-100 fw-bold py-2 mb-3">
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mb-3">
                             <i class="fas fa-user-plus me-2"></i>Daftar
                         </button>
                     </form>
 
                     <div class="text-center small">
                         Sudah punya akun?
-                        <a href="{{ route('login') }}" class="fw-semibold text-decoration-none">Login di sini</a>
+                        <a href="{{ route('login') }}" class="fw-semibold text-decoration-none auth-link-accent">Login di sini</a>
                     </div>
                     <hr>
                     <p class="text-center mb-0">
