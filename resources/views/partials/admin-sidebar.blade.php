@@ -31,6 +31,10 @@
             <i class="fas fa-undo text-center"></i>
             <span>Konfirmasi Pengembalian</span>
         </a>
+        <a href="{{ route('admin.laporan.index') }}" class="nav-link admin-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">
+            <i class="fas fa-file-excel text-center"></i>
+            <span>Laporan</span>
+        </a>
 
         <div class="px-4 mb-2 mt-3 admin-sidebar-label fw-semibold">Sistem</div>
         <a href="{{ route('home') }}" target="_blank" class="nav-link admin-link">
