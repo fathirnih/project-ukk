@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\AdminAuth;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\AdminPeminjamanController;
 use App\Http\Controllers\AdminPengembalianController;
 use App\Http\Controllers\AnggotaController;
@@ -73,6 +74,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/pengembalian/{id}/konfirmasi', [AdminPengembalianController::class, 'konfirmasi'])->name('pengembalian.konfirmasi');
         Route::post('/pengembalian/{id}/tolak', [AdminPengembalianController::class, 'tolak'])->name('pengembalian.tolak');
         Route::post('/pengembalian/recalculate-denda', [AdminPengembalianController::class, 'recalculateDenda'])->name('pengembalian.recalculate-denda');
+
+        // Laporan
+        Route::get('/laporan', [AdminReportController::class, 'index'])->name('laporan.index');
+        Route::get('/laporan/peminjaman/export', [AdminReportController::class, 'exportPeminjaman'])->name('laporan.peminjaman.export');
+        Route::get('/laporan/pengembalian/export', [AdminReportController::class, 'exportPengembalian'])->name('laporan.pengembalian.export');
 
         // Buku CRUD
         Route::resource('buku', BukuController::class);
