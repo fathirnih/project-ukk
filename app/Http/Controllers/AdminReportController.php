@@ -11,21 +11,13 @@ class AdminReportController extends Controller
 {
     public function index(Request $request)
     {
-        $validated = $request->validate([
-            'tanggal_awal' => 'nullable|date',
-            'tanggal_akhir' => 'nullable|date|after_or_equal:tanggal_awal',
-        ]);
-
-        $tanggalAwal = $validated['tanggal_awal'] ?? null;
-        $tanggalAkhir = $validated['tanggal_akhir'] ?? null;
+        [$tanggalAwal, $tanggalAkhir] = $this->validatedFilterDate($request);
 
         $peminjamanQuery = Peminjaman::query();
         $pengembalianQuery = Pengembalian::query();
 
-        if ($tanggalAwal && $tanggalAkhir) {
-            $peminjamanQuery->whereBetween('tanggal_pinjam', [$tanggalAwal, $tanggalAkhir]);
-            $pengembalianQuery->whereBetween('tanggal_pengajuan', [$tanggalAwal, $tanggalAkhir]);
-        }
+        $this->applyDateFilter($peminjamanQuery, 'tanggal_pinjam', $tanggalAwal, $tanggalAkhir);
+        $this->applyDateFilter($pengembalianQuery, 'tanggal_pengajuan', $tanggalAwal, $tanggalAkhir);
 
         $totalPeminjaman = $peminjamanQuery->count();
         $totalPengembalian = $pengembalianQuery->count();
@@ -42,10 +34,12 @@ class AdminReportController extends Controller
 
     public function exportPeminjaman(Request $request)
     {
-        [$tanggalAwal, $tanggalAkhir] = $this->resolveDateRange($request);
+        [$tanggalAwal, $tanggalAkhir] = $this->validatedFilterDate($request);
 
-        $peminjamans = Peminjaman::with(['anggota', 'detailPeminjamans.buku', 'pengembalian'])
-            ->whereBetween('tanggal_pinjam', [$tanggalAwal, $tanggalAkhir])
+        $query = Peminjaman::with(['anggota', 'detailPeminjamans.buku', 'pengembalian']);
+        $this->applyDateFilter($query, 'tanggal_pinjam', $tanggalAwal, $tanggalAkhir);
+
+        $peminjamans = $query
             ->orderBy('tanggal_pinjam')
             ->orderBy('id')
             ->get();
@@ -89,17 +83,20 @@ class AdminReportController extends Controller
             ];
         }
 
-        $filename = "laporan-peminjaman-{$tanggalAwal}-sampai-{$tanggalAkhir}.xlsx";
+        [$labelMulai, $labelSampai] = $this->rangeLabel($tanggalAwal, $tanggalAkhir);
+        $filename = "laporan-peminjaman-{$labelMulai}-sampai-{$labelSampai}.xlsx";
 
         return SimpleXlsxExporter::download($filename, $rows, 'Laporan Peminjaman');
     }
 
     public function exportPengembalian(Request $request)
     {
-        [$tanggalAwal, $tanggalAkhir] = $this->resolveDateRange($request);
+        [$tanggalAwal, $tanggalAkhir] = $this->validatedFilterDate($request);
 
-        $pengembalians = Pengembalian::with(['peminjaman.anggota', 'peminjaman.detailPeminjamans.buku'])
-            ->whereBetween('tanggal_pengajuan', [$tanggalAwal, $tanggalAkhir])
+        $query = Pengembalian::with(['peminjaman.anggota', 'peminjaman.detailPeminjamans.buku']);
+        $this->applyDateFilter($query, 'tanggal_pengajuan', $tanggalAwal, $tanggalAkhir);
+
+        $pengembalians = $query
             ->orderBy('tanggal_pengajuan')
             ->orderBy('id')
             ->get();
@@ -146,21 +143,56 @@ class AdminReportController extends Controller
             ];
         }
 
-        $filename = "laporan-pengembalian-{$tanggalAwal}-sampai-{$tanggalAkhir}.xlsx";
+        [$labelMulai, $labelSampai] = $this->rangeLabel($tanggalAwal, $tanggalAkhir);
+        $filename = "laporan-pengembalian-{$labelMulai}-sampai-{$labelSampai}.xlsx";
 
         return SimpleXlsxExporter::download($filename, $rows, 'Laporan Pengembalian');
     }
 
-    private function resolveDateRange(Request $request): array
+    private function validatedFilterDate(Request $request): array
     {
         $validated = $request->validate([
             'tanggal_awal' => 'nullable|date',
             'tanggal_akhir' => 'nullable|date|after_or_equal:tanggal_awal',
         ]);
 
-        $tanggalAwal = $validated['tanggal_awal'] ?? now()->startOfMonth()->toDateString();
-        $tanggalAkhir = $validated['tanggal_akhir'] ?? now()->toDateString();
+        return [
+            $validated['tanggal_awal'] ?? null,
+            $validated['tanggal_akhir'] ?? null,
+        ];
+    }
 
-        return [$tanggalAwal, $tanggalAkhir];
+    private function applyDateFilter($query, string $column, ?string $tanggalAwal, ?string $tanggalAkhir): void
+    {
+        if ($tanggalAwal && $tanggalAkhir) {
+            $query->whereBetween($column, [$tanggalAwal, $tanggalAkhir]);
+            return;
+        }
+
+        if ($tanggalAwal) {
+            $query->whereBetween($column, [$tanggalAwal, now()->toDateString()]);
+            return;
+        }
+
+        if ($tanggalAkhir) {
+            $query->whereDate($column, '<=', $tanggalAkhir);
+        }
+    }
+
+    private function rangeLabel(?string $tanggalAwal, ?string $tanggalAkhir): array
+    {
+        if ($tanggalAwal && $tanggalAkhir) {
+            return [$tanggalAwal, $tanggalAkhir];
+        }
+
+        if ($tanggalAwal) {
+            return [$tanggalAwal, now()->toDateString()];
+        }
+
+        if ($tanggalAkhir) {
+            return ['awal-data', $tanggalAkhir];
+        }
+
+        return ['awal-data', 'sekarang'];
     }
 }

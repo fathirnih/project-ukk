@@ -143,8 +143,8 @@
                                     <td class="text-center">{{ $index + 1 }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            @if($detail->buku->cover && file_exists(public_path('storage/covers/' . $detail->buku->cover)))
-                                                <img src="{{ asset('storage/covers/' . $detail->buku->cover) }}"
+                                            @if($detail->buku->cover && file_exists(public_path('covers/' . $detail->buku->cover)))
+                                                <img src="{{ asset('covers/' . $detail->buku->cover) }}"
                                                      alt="{{ $detail->buku->judul }}"
                                                      class="img-thumbnail me-2 admin-detail-book-cover">
                                             @else

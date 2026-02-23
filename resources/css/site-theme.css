@@ -214,6 +214,35 @@ body.auth-layout {
     max-width: 430px;
 }
 
+body.auth-layout.auth-layout-login .auth-shell {
+    max-width: 900px;
+}
+
+body.auth-layout.auth-layout-login .auth-frame {
+    border-radius: 0.9rem;
+}
+
+body.auth-layout.auth-layout-login .auth-brand-panel {
+    padding: 1.8rem;
+}
+
+body.auth-layout.auth-layout-login .auth-brand-icon {
+    font-size: 4rem;
+}
+
+body.auth-layout.auth-layout-login .auth-form-card {
+    max-width: 385px;
+}
+
+body.auth-layout.auth-layout-login .auth-form-card h4 {
+    font-size: 1.3rem;
+}
+
+body.auth-layout.auth-layout-login .auth-form-card .btn {
+    padding-top: 0.45rem;
+    padding-bottom: 0.45rem;
+}
+
 body.auth-layout.auth-layout-register {
     display: block;
     min-height: 100vh;

@@ -21,8 +21,11 @@ class AuthController extends Controller
             'nama' => 'required',
         ]);
 
-        $anggota = Anggota::where('nisn', $request->nisn)
-            ->where('nama', $request->nama)
+        $nisn = trim((string) $request->nisn);
+        $nama = $this->toUpper(trim((string) $request->nama));
+
+        $anggota = Anggota::where('nisn', $nisn)
+            ->where('nama', $nama)
             ->first();
 
         if ($anggota) {
@@ -54,11 +57,16 @@ class AuthController extends Controller
             'alamat' => 'nullable',
         ]);
 
+        $nisn = trim((string) $request->nisn);
+        $nama = $this->toUpper(trim((string) $request->nama));
+        $kelas = $request->kelas !== null ? trim((string) $request->kelas) : null;
+        $alamat = $request->alamat !== null ? trim((string) $request->alamat) : null;
+
         Anggota::create([
-            'nisn' => $request->nisn,
-            'nama' => $request->nama,
-            'kelas' => $request->kelas,
-            'alamat' => $request->alamat,
+            'nisn' => $nisn,
+            'nama' => $nama,
+            'kelas' => $kelas,
+            'alamat' => $alamat,
         ]);
 
         return redirect()->route('login')->with('success', 'Pendaftaran berhasil! Silakan login.');
@@ -68,5 +76,10 @@ class AuthController extends Controller
     {
         Session::flush();
         return redirect()->route('home')->with('success', 'Logout berhasil!');
+    }
+
+    private function toUpper(string $value): string
+    {
+        return mb_strtoupper($value, 'UTF-8');
     }
 }

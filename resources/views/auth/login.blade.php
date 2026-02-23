@@ -6,7 +6,7 @@
     <title>Login - Perpustakaan Digital</title>
     @vite(['resources/css/site-theme.css', 'resources/js/app.js'])
 </head>
-<body class="auth-layout">
+<body class="auth-layout auth-layout-login">
     <div class="container auth-shell">
         <div class="row g-0 auth-frame overflow-hidden">
             <div class="col-lg-5 d-none d-lg-flex auth-brand-panel">
@@ -20,7 +20,7 @@
                 </div>
             </div>
             <div class="col-lg-7 auth-form-panel">
-                <div class="auth-form-card p-4 p-md-5 mx-auto">
+                <div class="auth-form-card p-4 p-md-4 mx-auto">
                     @include('partials.flash-message')
                     <div class="text-center mb-4">
                         <i class="fas fa-book-open fa-3x text-primary mb-3"></i>
@@ -41,7 +41,7 @@
                             <label for="nama" class="form-label fw-bold">Nama</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="fas fa-user"></i></span>
-                                <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan Nama" required>
+                                <input type="text" class="form-control js-uppercase" id="nama" name="nama" placeholder="Masukkan Nama" required>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mb-3">
@@ -63,5 +63,12 @@
             </div>
         </div>
     </div>
+    <script>
+        document.querySelectorAll('.js-uppercase').forEach((element) => {
+            element.addEventListener('input', () => {
+                element.value = element.value.toUpperCase();
+            });
+        });
+    </script>
 </body>
 </html>
