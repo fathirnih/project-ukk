@@ -11,18 +11,17 @@ class AdminAuth
 {
     public function handle(Request $request, Closure $next)
     {
-        // Check if user is a member (using session) - show access denied
+        // Member session cannot access admin area.
         if (Session::has('anggota_id')) {
-            Session::flush();
             return response()->view('admin.access-denied');
         }
 
-        // Check if admin is authenticated
+        // Admin session can access admin area.
         if (Auth::guard('web')->check()) {
             return $next($request);
         }
 
-        // Not authenticated at all - redirect to admin login
+        // Not authenticated as admin.
         return redirect()->route('admin.login');
     }
 }
