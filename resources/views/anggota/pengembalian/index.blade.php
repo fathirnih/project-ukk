@@ -43,8 +43,8 @@
                                 <div class="member-book-list">
                                     @foreach($peminjaman->detailPeminjamans as $detail)
                                         <div class="member-book-item">
-                                            @if($detail->buku->cover && file_exists(public_path('storage/covers/' . $detail->buku->cover)))
-                                                <img src="{{ asset('storage/covers/' . $detail->buku->cover) }}" alt="{{ $detail->buku->judul }}" class="member-book-cover">
+                                            @if($detail->buku->cover && file_exists(public_path('covers/' . $detail->buku->cover)))
+                                                <img src="{{ asset('covers/' . $detail->buku->cover) }}" alt="{{ $detail->buku->judul }}" class="member-book-cover">
                                             @else
                                                 <div class="member-book-fallback bg-secondary text-white d-flex align-items-center justify-content-center">
                                                     <i class="fas fa-book"></i>

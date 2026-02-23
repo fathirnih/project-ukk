@@ -85,8 +85,8 @@
                                             @endif
                                         </div>
                                         <div>
-                                            @if($buku->cover && file_exists(public_path('storage/covers/' . $buku->cover)))
-                                                <img src="{{ asset('storage/covers/' . $buku->cover) }}" alt="{{ $buku->judul }}" class="member-book-cover">
+                                            @if($buku->cover && file_exists(public_path('covers/' . $buku->cover)))
+                                                <img src="{{ asset('covers/' . $buku->cover) }}" alt="{{ $buku->judul }}" class="member-book-cover">
                                             @else
                                                 <div class="member-book-fallback bg-secondary text-white d-flex align-items-center justify-content-center">
                                                     <i class="fas fa-book"></i>
