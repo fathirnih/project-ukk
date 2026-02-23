@@ -36,7 +36,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="nama" class="form-label fw-bold">Nama <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="nama" name="nama" value="{{ old('nama') }}" required>
+                            <input type="text" class="form-control js-uppercase" id="nama" name="nama" value="{{ old('nama') }}" required>
                         </div>
                         <div class="mb-3">
                             <label for="kelas" class="form-label fw-bold">Kelas</label>
@@ -65,5 +65,12 @@
             </div>
         </div>
     </div>
+    <script>
+        document.querySelectorAll('.js-uppercase').forEach((element) => {
+            element.addEventListener('input', () => {
+                element.value = element.value.toUpperCase();
+            });
+        });
+    </script>
 </body>
 </html>
