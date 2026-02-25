@@ -83,6 +83,20 @@
                                                 </div>
                                             @endforeach
                                         </div>
+
+                                        @if($peminjaman->status_pinjam == 'ditolak' && $peminjaman->catatan_penolakan)
+                                            <div class="alert alert-danger mt-3 mb-0 py-2">
+                                                <small>
+                                                    <strong>Catatan admin:</strong> {{ $peminjaman->catatan_penolakan }}
+                                                </small>
+                                            </div>
+                                        @elseif($statusPengembalian == 'ditolak' && $peminjaman->pengembalian?->catatan_penolakan)
+                                            <div class="alert alert-danger mt-3 mb-0 py-2">
+                                                <small>
+                                                    <strong>Catatan admin:</strong> {{ $peminjaman->pengembalian->catatan_penolakan }}
+                                                </small>
+                                            </div>
+                                        @endif
                                     </div>
                                     <div class="col-lg-4">
                                         <div class="d-grid gap-2">
