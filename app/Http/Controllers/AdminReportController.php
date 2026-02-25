@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Anggota;
+use App\Models\Buku;
+use App\Models\Kategori;
 use App\Models\Peminjaman;
 use App\Models\Pengembalian;
 use App\Support\SimpleXlsxExporter;
@@ -12,12 +15,24 @@ class AdminReportController extends Controller
     public function index(Request $request)
     {
         [$tanggalAwal, $tanggalAkhir] = $this->validatedFilterDate($request);
+        $anggotaId = $this->validatedAnggotaId($request);
+        [$statusPinjam, $statusPengembalian] = $this->validatedStatusFilter($request);
+        [$bukuId, $kategoriId] = $this->validatedBookFilter($request);
+        $anggotas = Anggota::orderBy('nama')->get(['id', 'nama', 'nisn']);
+        $bukus = Buku::orderBy('judul')->get(['id', 'judul']);
+        $kategoris = Kategori::orderBy('nama')->get(['id', 'nama']);
 
         $peminjamanQuery = Peminjaman::query();
         $pengembalianQuery = Pengembalian::query();
 
         $this->applyDateFilter($peminjamanQuery, 'tanggal_pinjam', $tanggalAwal, $tanggalAkhir);
         $this->applyDateFilter($pengembalianQuery, 'tanggal_pengajuan', $tanggalAwal, $tanggalAkhir);
+        $this->applyAnggotaFilter($peminjamanQuery, $anggotaId);
+        $this->applyAnggotaFilter($pengembalianQuery, $anggotaId);
+        $this->applyStatusFilter($peminjamanQuery, $statusPinjam, $statusPengembalian);
+        $this->applyStatusFilter($pengembalianQuery, $statusPinjam, $statusPengembalian);
+        $this->applyBookCategoryFilter($peminjamanQuery, $bukuId, $kategoriId);
+        $this->applyBookCategoryFilter($pengembalianQuery, $bukuId, $kategoriId);
 
         $totalPeminjaman = $peminjamanQuery->count();
         $totalPengembalian = $pengembalianQuery->count();
@@ -26,6 +41,14 @@ class AdminReportController extends Controller
         return view('admin.laporan.index', compact(
             'tanggalAwal',
             'tanggalAkhir',
+            'anggotaId',
+            'anggotas',
+            'statusPinjam',
+            'statusPengembalian',
+            'bukuId',
+            'kategoriId',
+            'bukus',
+            'kategoris',
             'totalPeminjaman',
             'totalPengembalian',
             'totalDenda'
@@ -35,9 +58,15 @@ class AdminReportController extends Controller
     public function exportPeminjaman(Request $request)
     {
         [$tanggalAwal, $tanggalAkhir] = $this->validatedFilterDate($request);
+        $anggotaId = $this->validatedAnggotaId($request);
+        [$statusPinjam, $statusPengembalian] = $this->validatedStatusFilter($request);
+        [$bukuId, $kategoriId] = $this->validatedBookFilter($request);
 
         $query = Peminjaman::with(['anggota', 'detailPeminjamans.buku', 'pengembalian']);
         $this->applyDateFilter($query, 'tanggal_pinjam', $tanggalAwal, $tanggalAkhir);
+        $this->applyAnggotaFilter($query, $anggotaId);
+        $this->applyStatusFilter($query, $statusPinjam, $statusPengembalian);
+        $this->applyBookCategoryFilter($query, $bukuId, $kategoriId);
 
         $peminjamans = $query
             ->orderBy('tanggal_pinjam')
@@ -92,9 +121,15 @@ class AdminReportController extends Controller
     public function exportPengembalian(Request $request)
     {
         [$tanggalAwal, $tanggalAkhir] = $this->validatedFilterDate($request);
+        $anggotaId = $this->validatedAnggotaId($request);
+        [$statusPinjam, $statusPengembalian] = $this->validatedStatusFilter($request);
+        [$bukuId, $kategoriId] = $this->validatedBookFilter($request);
 
         $query = Pengembalian::with(['peminjaman.anggota', 'peminjaman.detailPeminjamans.buku']);
         $this->applyDateFilter($query, 'tanggal_pengajuan', $tanggalAwal, $tanggalAkhir);
+        $this->applyAnggotaFilter($query, $anggotaId);
+        $this->applyStatusFilter($query, $statusPinjam, $statusPengembalian);
+        $this->applyBookCategoryFilter($query, $bukuId, $kategoriId);
 
         $pengembalians = $query
             ->orderBy('tanggal_pengajuan')
@@ -162,6 +197,41 @@ class AdminReportController extends Controller
         ];
     }
 
+    private function validatedAnggotaId(Request $request): ?int
+    {
+        $validated = $request->validate([
+            'anggota_id' => 'nullable|integer|exists:anggota,id',
+        ]);
+
+        return isset($validated['anggota_id']) ? (int) $validated['anggota_id'] : null;
+    }
+
+    private function validatedStatusFilter(Request $request): array
+    {
+        $validated = $request->validate([
+            'status_pinjam' => 'nullable|in:pending,disetujui,ditolak',
+            'status_pengembalian' => 'nullable|in:pending_admin,selesai,ditolak',
+        ]);
+
+        return [
+            $validated['status_pinjam'] ?? null,
+            $validated['status_pengembalian'] ?? null,
+        ];
+    }
+
+    private function validatedBookFilter(Request $request): array
+    {
+        $validated = $request->validate([
+            'buku_id' => 'nullable|integer|exists:buku,id',
+            'kategori_id' => 'nullable|integer|exists:kategori,id',
+        ]);
+
+        return [
+            isset($validated['buku_id']) ? (int) $validated['buku_id'] : null,
+            isset($validated['kategori_id']) ? (int) $validated['kategori_id'] : null,
+        ];
+    }
+
     private function applyDateFilter($query, string $column, ?string $tanggalAwal, ?string $tanggalAkhir): void
     {
         if ($tanggalAwal && $tanggalAkhir) {
@@ -176,6 +246,81 @@ class AdminReportController extends Controller
 
         if ($tanggalAkhir) {
             $query->whereDate($column, '<=', $tanggalAkhir);
+        }
+    }
+
+    private function applyAnggotaFilter($query, ?int $anggotaId): void
+    {
+        if (!$anggotaId) {
+            return;
+        }
+
+        if ($query->getModel() instanceof Peminjaman) {
+            $query->where('anggota_id', $anggotaId);
+            return;
+        }
+
+        if ($query->getModel() instanceof Pengembalian) {
+            $query->whereHas('peminjaman', function ($q) use ($anggotaId) {
+                $q->where('anggota_id', $anggotaId);
+            });
+        }
+    }
+
+    private function applyStatusFilter($query, ?string $statusPinjam, ?string $statusPengembalian): void
+    {
+        if ($query->getModel() instanceof Peminjaman) {
+            if ($statusPinjam) {
+                $query->where('status_pinjam', $statusPinjam);
+            }
+
+            if ($statusPengembalian) {
+                $query->whereHas('pengembalian', function ($q) use ($statusPengembalian) {
+                    $q->where('status', $statusPengembalian);
+                });
+            }
+
+            return;
+        }
+
+        if ($query->getModel() instanceof Pengembalian) {
+            if ($statusPinjam) {
+                $query->whereHas('peminjaman', function ($q) use ($statusPinjam) {
+                    $q->where('status_pinjam', $statusPinjam);
+                });
+            }
+
+            if ($statusPengembalian) {
+                $query->where('status', $statusPengembalian);
+            }
+        }
+    }
+
+    private function applyBookCategoryFilter($query, ?int $bukuId, ?int $kategoriId): void
+    {
+        if (!$bukuId && !$kategoriId) {
+            return;
+        }
+
+        $bookConstraint = function ($detailQuery) use ($bukuId, $kategoriId) {
+            if ($bukuId) {
+                $detailQuery->where('buku_id', $bukuId);
+            }
+
+            if ($kategoriId) {
+                $detailQuery->whereHas('buku', function ($bukuQuery) use ($kategoriId) {
+                    $bukuQuery->where('kategori_id', $kategoriId);
+                });
+            }
+        };
+
+        if ($query->getModel() instanceof Peminjaman) {
+            $query->whereHas('detailPeminjamans', $bookConstraint);
+            return;
+        }
+
+        if ($query->getModel() instanceof Pengembalian) {
+            $query->whereHas('peminjaman.detailPeminjamans', $bookConstraint);
         }
     }
 
