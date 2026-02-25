@@ -273,23 +273,10 @@ class AdminReportController extends Controller
             if ($statusPinjam) {
                 $query->where('status_pinjam', $statusPinjam);
             }
-
-            if ($statusPengembalian) {
-                $query->whereHas('pengembalian', function ($q) use ($statusPengembalian) {
-                    $q->where('status', $statusPengembalian);
-                });
-            }
-
             return;
         }
 
         if ($query->getModel() instanceof Pengembalian) {
-            if ($statusPinjam) {
-                $query->whereHas('peminjaman', function ($q) use ($statusPinjam) {
-                    $q->where('status_pinjam', $statusPinjam);
-                });
-            }
-
             if ($statusPengembalian) {
                 $query->where('status', $statusPengembalian);
             }
