@@ -84,7 +84,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('buku', BukuController::class);
 
         // Anggota CRUD
-        Route::resource('anggota', AnggotaController::class);
+        Route::resource('anggota', AnggotaController::class)
+            ->parameters(['anggota' => 'anggota'])
+            ->except(['show']);
 
         // Kategori CRUD
         Route::resource('kategori', KategoriController::class);
@@ -93,7 +95,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
-// Anggota Auth Routes (Public - NISN + Nama)
+// Anggota Auth Routes (Public - NISN + Password)
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/login', [AuthController::class, 'loginProcess'])->name('login.process');
 Route::get('/register', [AuthController::class, 'register'])->name('register');

@@ -27,7 +27,7 @@
                             <article class="member-record-card">
                                 <div class="member-record-head">
                                     <div>
-                                        <div class="fw-bold">#{{ str_pad($peminjaman->id, 5, '0', STR_PAD_LEFT) }}</div>
+                                        <div class="fw-bold">{{ $peminjaman->kode }}</div>
                                         <div class="member-record-meta">
                                             <i class="fas fa-calendar-plus me-1"></i>{{ $peminjaman->tanggal_pinjam->format('d/m/Y') }}
                                             <span class="mx-2">-</span>

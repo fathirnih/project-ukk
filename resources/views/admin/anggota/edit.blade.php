@@ -24,7 +24,7 @@
     <div class="card-body admin-form-shell">
         <div class="row g-4">
             <div class="col-lg-8">
-        <form action="{{ route('admin.anggota.update', $anggota->id) }}" method="POST">
+        <form action="{{ route('admin.anggota.update', ['anggotum' => $anggota->id]) }}" method="POST">
             @csrf
             @method('PUT')
             <div class="row">
@@ -55,6 +55,20 @@
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="password" class="form-label admin-form-label">Password Baru</label>
+                    <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" minlength="6" placeholder="Kosongkan jika tidak diubah">
+                    @error('password')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="password_confirmation" class="form-label admin-form-label">Konfirmasi Password Baru</label>
+                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" minlength="6" placeholder="Ulangi password baru">
+                </div>
+            </div>
+
             <div class="d-grid gap-2 d-md-flex admin-form-actions">
                 <button type="submit" class="btn btn-warning admin-action-btn">
                     <i class="fas fa-save me-2"></i>Perbarui Anggota
@@ -76,7 +90,7 @@
                 </div>
                 <div class="admin-side-card">
                     <h6><i class="fas fa-lightbulb me-2"></i>Tips</h6>
-                    <p class="mb-0 small text-muted">Gunakan format kelas konsisten agar laporan anggota lebih rapi.</p>
+                    <p class="mb-0 small text-muted">Gunakan format kelas konsisten agar laporan anggota lebih rapi. Isi password baru hanya jika ingin reset.</p>
                 </div>
             </div>
         </div>

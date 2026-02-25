@@ -81,10 +81,10 @@
                             <td>{{ $item->kelas ?? '-' }}</td>
                             <td>{{ Str::limit($item->alamat ?? '-', 30) }}</td>
                             <td class="text-center">
-                                <a href="{{ route('admin.anggota.edit', $item->id) }}" class="btn btn-warning btn-sm admin-icon-btn">
+                                <a href="{{ route('admin.anggota.edit', ['anggotum' => $item->id]) }}" class="btn btn-warning btn-sm admin-icon-btn">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="{{ route('admin.anggota.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus anggota ini?')">
+                                <form action="{{ route('admin.anggota.destroy', ['anggotum' => $item->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus anggota ini?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm admin-icon-btn">

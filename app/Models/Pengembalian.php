@@ -30,6 +30,11 @@ class Pengembalian extends Model
         'total_denda' => 'integer',
     ];
 
+    public function getKodeAttribute(): string
+    {
+        return 'PGM-' . str_pad((string) $this->id, 6, '0', STR_PAD_LEFT);
+    }
+
     public function peminjaman()
     {
         return $this->belongsTo(Peminjaman::class);

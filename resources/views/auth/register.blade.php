@@ -39,6 +39,14 @@
                             <input type="text" class="form-control js-uppercase" id="nama" name="nama" value="{{ old('nama') }}" required>
                         </div>
                         <div class="mb-3">
+                            <label for="password" class="form-label fw-bold">Password <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="password" name="password" required minlength="6">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password_confirmation" class="form-label fw-bold">Konfirmasi Password <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required minlength="6">
+                        </div>
+                        <div class="mb-3">
                             <label for="kelas" class="form-label fw-bold">Kelas</label>
                             <input type="text" class="form-control" id="kelas" name="kelas" value="{{ old('kelas') }}" placeholder="Contoh: XII IPA 1">
                         </div>

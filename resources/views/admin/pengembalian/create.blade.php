@@ -22,7 +22,7 @@
                         <option value="">-- Pilih Peminjaman --</option>
                         @foreach($peminjamans as $peminjaman)
                             <option value="{{ $peminjaman->id }}" {{ old('peminjaman_id') == $peminjaman->id ? 'selected' : '' }}>
-                                #{{ str_pad($peminjaman->id, 5, '0', STR_PAD_LEFT) }} - {{ $peminjaman->anggota->nama }} ({{ $peminjaman->anggota->nisn }})
+                                {{ $peminjaman->kode }} - {{ $peminjaman->anggota->nama }} ({{ $peminjaman->anggota->nisn }})
                             </option>
                         @endforeach
                     </select>

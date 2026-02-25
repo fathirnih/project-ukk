@@ -27,7 +27,7 @@
                             <article class="member-record-card">
                                 <div class="member-record-head">
                                     <div>
-                                        <div class="fw-bold">#{{ str_pad($pengembalian->id, 5, '0', STR_PAD_LEFT) }}</div>
+                                        <div class="fw-bold">{{ $pengembalian->kode }}</div>
                                         <div class="member-record-meta">
                                             <i class="fas fa-calendar-check me-1"></i>{{ $pengembalian->peminjaman->tanggal_kembali->format('d/m/Y') }}
                                         </div>
@@ -61,6 +61,14 @@
                                                 </div>
                                             @endforeach
                                         </div>
+
+                                        @if($pengembalian->status == 'ditolak' && $pengembalian->catatan_penolakan)
+                                            <div class="alert alert-danger mt-3 mb-0 py-2">
+                                                <small>
+                                                    <strong>Catatan admin:</strong> {{ $pengembalian->catatan_penolakan }}
+                                                </small>
+                                            </div>
+                                        @endif
                                     </div>
                                     <div class="col-lg-4">
                                         <div class="d-grid gap-2">

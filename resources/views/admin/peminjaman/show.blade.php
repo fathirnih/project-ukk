@@ -23,7 +23,7 @@
                 <div class="admin-index-overview mb-3">
                     <div class="admin-mini-stat">
                         <span>Kode</span>
-                        <strong>#{{ str_pad($peminjaman->id, 5, '0', STR_PAD_LEFT) }}</strong>
+                        <strong>{{ $peminjaman->kode }}</strong>
                     </div>
                     <div class="admin-mini-stat">
                         <span>Total Buku</span>

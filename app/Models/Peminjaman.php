@@ -25,6 +25,11 @@ class Peminjaman extends Model
         'tanggal_kembali' => 'date',
     ];
 
+    public function getKodeAttribute(): string
+    {
+        return 'PMJ-' . str_pad((string) $this->id, 6, '0', STR_PAD_LEFT);
+    }
+
     public function anggota()
     {
         return $this->belongsTo(Anggota::class);
