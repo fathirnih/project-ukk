@@ -21,7 +21,7 @@
 <div class="admin-index-overview mb-4">
     <div class="admin-mini-stat">
         <span>Kode Pengembalian</span>
-        <strong>#{{ str_pad($pengembalian->id, 5, '0', STR_PAD_LEFT) }}</strong>
+        <strong>{{ $pengembalian->kode }}</strong>
     </div>
     <div class="admin-mini-stat">
         <span>Total Judul</span>
@@ -44,7 +44,7 @@
                 <table class="table table-borderless mb-0">
                     <tr>
                         <td class="fw-bold" style="width: 100px;">Kode</td>
-                        <td>: #{{ str_pad($pengembalian->id, 5, '0', STR_PAD_LEFT) }}</td>
+                        <td>: {{ $pengembalian->kode }}</td>
                     </tr>
                     <tr>
                         <td class="fw-bold">Anggota</td>

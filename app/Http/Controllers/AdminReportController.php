@@ -75,7 +75,7 @@ class AdminReportController extends Controller
 
         $rows = [[
             'No',
-            'ID Peminjaman',
+            'Kode Peminjaman',
             'Tanggal Pinjam',
             'Tanggal Kembali',
             'Nama Anggota',
@@ -98,7 +98,7 @@ class AdminReportController extends Controller
 
             $rows[] = [
                 $index + 1,
-                $peminjaman->id,
+                $peminjaman->kode,
                 optional($peminjaman->tanggal_pinjam)->format('Y-m-d'),
                 optional($peminjaman->tanggal_kembali)->format('Y-m-d'),
                 $peminjaman->anggota->nama ?? '-',
@@ -138,8 +138,8 @@ class AdminReportController extends Controller
 
         $rows = [[
             'No',
-            'ID Pengembalian',
-            'ID Peminjaman',
+            'Kode Pengembalian',
+            'Kode Peminjaman',
             'Tanggal Pengajuan',
             'Tanggal Dikembalikan',
             'Nama Anggota',
@@ -163,8 +163,8 @@ class AdminReportController extends Controller
 
             $rows[] = [
                 $index + 1,
-                $pengembalian->id,
-                $peminjaman->id ?? '-',
+                $pengembalian->kode,
+                $peminjaman?->kode ?? '-',
                 optional($pengembalian->tanggal_pengajuan)->format('Y-m-d'),
                 optional($pengembalian->tanggal_dikembalikan)->format('Y-m-d') ?? '-',
                 $peminjaman?->anggota?->nama ?? '-',
