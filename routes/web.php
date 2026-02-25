@@ -84,7 +84,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('buku', BukuController::class);
 
         // Anggota CRUD
-        Route::resource('anggota', AnggotaController::class);
+        Route::resource('anggota', AnggotaController::class)
+            ->parameters(['anggota' => 'anggota'])
+            ->except(['show']);
 
         // Kategori CRUD
         Route::resource('kategori', KategoriController::class);

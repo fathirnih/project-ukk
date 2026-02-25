@@ -24,7 +24,7 @@
     <div class="card-body admin-form-shell">
         <div class="row g-4">
             <div class="col-lg-8">
-        <form action="{{ route('admin.anggota.update', $anggota->id) }}" method="POST">
+        <form action="{{ route('admin.anggota.update', ['anggotum' => $anggota->id]) }}" method="POST">
             @csrf
             @method('PUT')
             <div class="row">

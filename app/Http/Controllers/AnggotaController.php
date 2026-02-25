@@ -88,13 +88,16 @@ class AnggotaController extends Controller
         return redirect()->route('admin.anggota.index')->with('success', 'Anggota berhasil ditambahkan!');
     }
 
-    public function edit(Anggota $anggota)
+    public function edit(Anggota $anggotum)
     {
+        $anggota = $anggotum;
         return view('admin.anggota.edit', compact('anggota'));
     }
 
-    public function update(Request $request, Anggota $anggota)
+    public function update(Request $request, Anggota $anggotum)
     {
+        $anggota = $anggotum;
+
         $request->validate([
             'nisn' => 'required|unique:anggota,nisn,' . $anggota->id,
             'nama' => 'required',
@@ -119,9 +122,9 @@ class AnggotaController extends Controller
         return redirect()->route('admin.anggota.index')->with('success', 'Anggota berhasil diperbarui!');
     }
 
-    public function destroy(Anggota $anggota)
+    public function destroy(Anggota $anggotum)
     {
-        $anggota->delete();
+        $anggotum->delete();
         return redirect()->route('admin.anggota.index')->with('success', 'Anggota berhasil dihapus!');
     }
 }
