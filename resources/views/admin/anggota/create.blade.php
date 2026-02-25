@@ -54,6 +54,20 @@
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="password" class="form-label admin-form-label">Password <span class="text-danger">*</span></label>
+                    <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" minlength="6" required>
+                    @error('password')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="password_confirmation" class="form-label admin-form-label">Konfirmasi Password <span class="text-danger">*</span></label>
+                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" minlength="6" required>
+                </div>
+            </div>
+
             <div class="d-grid gap-2 d-md-flex admin-form-actions">
                 <button type="submit" class="btn btn-success admin-action-btn">
                     <i class="fas fa-save me-2"></i>Simpan Anggota
@@ -69,6 +83,7 @@
                     <h6><i class="fas fa-circle-check me-2"></i>Checklist</h6>
                     <ul class="admin-side-list">
                         <li>NISN dan nama wajib diisi.</li>
+                        <li>Password minimal 6 karakter.</li>
                         <li>Isi kelas agar data segmentasi lebih mudah.</li>
                         <li>Alamat membantu validasi profil anggota.</li>
                     </ul>

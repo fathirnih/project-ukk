@@ -38,10 +38,10 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="nama" class="form-label fw-bold">Nama</label>
+                            <label for="password" class="form-label fw-bold">Password</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fas fa-user"></i></span>
-                                <input type="text" class="form-control js-uppercase" id="nama" name="nama" placeholder="Masukkan Nama" required>
+                                <span class="input-group-text bg-light"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan Password" required>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mb-3">
@@ -63,12 +63,5 @@
             </div>
         </div>
     </div>
-    <script>
-        document.querySelectorAll('.js-uppercase').forEach((element) => {
-            element.addEventListener('input', () => {
-                element.value = element.value.toUpperCase();
-            });
-        });
-    </script>
 </body>
 </html>

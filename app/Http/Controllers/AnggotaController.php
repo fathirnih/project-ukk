@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Anggota;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AnggotaController extends Controller
 {
@@ -71,6 +72,7 @@ class AnggotaController extends Controller
         $request->validate([
             'nisn' => 'required|unique:anggota',
             'nama' => 'required',
+            'password' => 'required|min:6|confirmed',
             'kelas' => 'nullable',
             'alamat' => 'nullable',
         ]);
@@ -80,6 +82,7 @@ class AnggotaController extends Controller
             'nama' => $request->nama,
             'kelas' => $request->kelas,
             'alamat' => $request->alamat,
+            'password' => Hash::make((string) $request->password),
         ]);
 
         return redirect()->route('admin.anggota.index')->with('success', 'Anggota berhasil ditambahkan!');
@@ -95,16 +98,23 @@ class AnggotaController extends Controller
         $request->validate([
             'nisn' => 'required|unique:anggota,nisn,' . $anggota->id,
             'nama' => 'required',
+            'password' => 'nullable|min:6|confirmed',
             'kelas' => 'nullable',
             'alamat' => 'nullable',
         ]);
 
-        $anggota->update([
+        $payload = [
             'nisn' => $request->nisn,
             'nama' => $request->nama,
             'kelas' => $request->kelas,
             'alamat' => $request->alamat,
-        ]);
+        ];
+
+        if ($request->filled('password')) {
+            $payload['password'] = Hash::make((string) $request->password);
+        }
+
+        $anggota->update($payload);
 
         return redirect()->route('admin.anggota.index')->with('success', 'Anggota berhasil diperbarui!');
     }

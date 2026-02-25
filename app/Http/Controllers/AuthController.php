@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Anggota;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
@@ -18,17 +19,14 @@ class AuthController extends Controller
     {
         $request->validate([
             'nisn' => 'required',
-            'nama' => 'required',
+            'password' => 'required',
         ]);
 
         $nisn = trim((string) $request->nisn);
-        $nama = $this->toUpper(trim((string) $request->nama));
+        $password = (string) $request->password;
+        $anggota = Anggota::where('nisn', $nisn)->first();
 
-        $anggota = Anggota::where('nisn', $nisn)
-            ->where('nama', $nama)
-            ->first();
-
-        if ($anggota) {
+        if ($anggota && $anggota->password && Hash::check($password, $anggota->password)) {
             // Logout admin if currently logged in
             Auth::guard('web')->logout();
             $request->session()->invalidate();
@@ -40,7 +38,7 @@ class AuthController extends Controller
             return redirect()->route('peminjaman.index')->with('success', 'Login berhasil!');
         }
 
-        return redirect()->back()->with('error', 'NISN atau nama tidak ditemukan!');
+        return redirect()->back()->with('error', 'NISN atau password salah!');
     }
 
     public function register()
@@ -53,6 +51,7 @@ class AuthController extends Controller
         $request->validate([
             'nisn' => 'required|unique:anggota',
             'nama' => 'required',
+            'password' => 'required|min:6|confirmed',
             'kelas' => 'nullable',
             'alamat' => 'nullable',
         ]);
@@ -67,6 +66,7 @@ class AuthController extends Controller
             'nama' => $nama,
             'kelas' => $kelas,
             'alamat' => $alamat,
+            'password' => Hash::make((string) $request->password),
         ]);
 
         return redirect()->route('login')->with('success', 'Pendaftaran berhasil! Silakan login.');
