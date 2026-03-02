@@ -25,7 +25,6 @@
                     <div class="member-stack">
                         @foreach($riwayat as $peminjaman)
                             @php
-                                $statusPengembalian = $peminjaman->pengembalian->status ?? null;
                                 $totalDetail = $peminjaman->detailPeminjamans->count();
                                 $totalKembali = $peminjaman->detailPeminjamans->where('status', 'dikembalikan')->count();
                                 $totalDipinjam = $peminjaman->detailPeminjamans->where('status', 'dipinjam')->count();
@@ -47,17 +46,7 @@
                                         @elseif($peminjaman->status_pinjam == 'ditolak')
                                             <span class="badge bg-danger member-status-badge">Ditolak</span>
                                         @elseif($peminjaman->status_pinjam == 'disetujui')
-                                            @if($semuaSudahKembali)
-                                                <span class="badge bg-secondary member-status-badge">Selesai</span>
-                                            @elseif($statusPengembalian == 'pending_admin')
-                                                <span class="badge bg-info member-status-badge">Mengembalikan</span>
-                                            @elseif($statusPengembalian == 'ditolak')
-                                                <span class="badge bg-danger member-status-badge">Ditolak</span>
-                                            @elseif($totalDipinjam > 0)
-                                                <span class="badge bg-success member-status-badge">Dipinjam</span>
-                                            @else
-                                                <span class="badge bg-secondary member-status-badge">-</span>
-                                            @endif
+                                            <span class="badge bg-success member-status-badge">Disetujui</span>
                                         @else
                                             <span class="badge bg-secondary member-status-badge">-</span>
                                         @endif
@@ -90,29 +79,17 @@
                                                     <strong>Catatan admin:</strong> {{ $peminjaman->catatan_penolakan }}
                                                 </small>
                                             </div>
-                                        @elseif($statusPengembalian == 'ditolak' && $peminjaman->pengembalian?->catatan_penolakan)
-                                            <div class="alert alert-danger mt-3 mb-0 py-2">
-                                                <small>
-                                                    <strong>Catatan admin:</strong> {{ $peminjaman->pengembalian->catatan_penolakan }}
-                                                </small>
-                                            </div>
                                         @endif
                                     </div>
                                     <div class="col-lg-4">
                                         <div class="d-grid gap-2">
                                             @if($peminjaman->status_pinjam == 'pending')
                                                 <span class="text-muted small">Menunggu...</span>
-                                            @elseif($peminjaman->status_pinjam == 'disetujui' && $totalDipinjam > 0 && !$statusPengembalian)
+                                            @elseif($peminjaman->status_pinjam == 'disetujui' && $totalDipinjam > 0 && !$peminjaman->pengembalian)
                                                 <a href="/peminjaman/ajuan-kembali/{{ $peminjaman->id }}" 
                                                    class="btn btn-sm btn-warning member-action-button"
                                                    onclick="return confirm('Ajukan pengembalian buku?')">
                                                     <i class="fas fa-undo me-1"></i>Kembalikan
-                                                </a>
-                                            @elseif($peminjaman->status_pinjam == 'disetujui' && $totalDipinjam > 0 && $statusPengembalian == 'ditolak' && $peminjaman->pengembalian)
-                                                <a href="{{ route('peminjaman.ajukan-ulang-pengembalian', $peminjaman->pengembalian->id) }}" 
-                                                   class="btn btn-sm btn-primary member-action-button"
-                                                   onclick="return confirm('Ajukan pengembalian ulang?')">
-                                                    <i class="fas fa-redo me-1"></i>Ajukan Lagi
                                                 </a>
                                             @elseif($peminjaman->status_pinjam == 'ditolak')
                                                 <a href="{{ route('peminjaman.ajukan-ulang', $peminjaman->id) }}" 
@@ -120,8 +97,6 @@
                                                    onclick="return confirm('Ajukan peminjaman ulang dengan buku yang sama?')">
                                                     <i class="fas fa-redo me-1"></i>Ajukan Lagi
                                                 </a>
-                                            @elseif($peminjaman->status_pinjam == 'disetujui' && $statusPengembalian == 'pending_admin')
-                                                <span class="text-muted small">Menunggu...</span>
                                             @else
                                                 <span class="text-muted small">-</span>
                                             @endif

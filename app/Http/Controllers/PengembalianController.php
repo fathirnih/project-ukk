@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Session;
 
 class PengembalianController extends Controller
 {
-    // Halaman index pengembalian (daftar buku yang dipinjam)
+    // Halaman pengembalian gabungan: ajuan + riwayat
     public function index()
     {
         $anggota = null;
@@ -27,23 +27,7 @@ class PengembalianController extends Controller
                             ->where('status_pinjam', 'disetujui')
                             ->whereDoesntHave('pengembalian')
                             ->get();
-        
-        return view('anggota.pengembalian.index', compact('anggota', 'pinjamans'));
-    }
 
-    // Riwayat pengembalian anggota
-    public function riwayat()
-    {
-        $anggota = null;
-        if (Session::has('anggota_id')) {
-            $anggota = Anggota::find(Session::get('anggota_id'));
-        }
-        
-        if (!$anggota) {
-            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
-        }
-
-        // Tampilkan riwayat pengembalian
         $riwayat = Pengembalian::with('peminjaman.detailPeminjamans.buku')
                             ->whereHas('peminjaman', function ($query) use ($anggota) {
                                 $query->where('anggota_id', $anggota->id);
@@ -51,10 +35,12 @@ class PengembalianController extends Controller
                             ->orderBy('created_at', 'desc')
                             ->paginate(10);
         
-        $response = response()->view('anggota.pengembalian.riwayat', compact('anggota', 'riwayat'));
-        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
-        $response->headers->set('Pragma', 'no-cache');
-        $response->headers->set('Expires', '0');
-        return $response;
+        return view('anggota.pengembalian.index', compact('anggota', 'pinjamans', 'riwayat'));
+    }
+
+    // Backward compatibility: route lama diarahkan ke halaman gabungan
+    public function riwayat()
+    {
+        return redirect()->route('pengembalian.index');
     }
 }
