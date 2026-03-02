@@ -48,7 +48,7 @@ class Peminjaman extends Model
 
     public function pengembalian()
     {
-        return $this->hasOne(Pengembalian::class);
+        return $this->hasOne(Pengembalian::class)->latestOfMany();
     }
 
     public function scopePending($query)

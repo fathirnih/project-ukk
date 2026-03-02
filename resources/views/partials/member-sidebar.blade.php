@@ -19,10 +19,6 @@
             <i class="fas fa-undo text-center"></i>
             <span class="sidebar-text">Pengembalian</span>
         </a>
-        <a class="sidebar-link {{ request()->routeIs('pengembalian.riwayat') ? 'active' : '' }}" href="{{ route('pengembalian.riwayat') }}">
-            <i class="fas fa-history text-center"></i>
-            <span class="sidebar-text">Riwayat Pengembalian</span>
-        </a>
     </nav>
 </aside>
 
@@ -49,10 +45,6 @@
             <a class="sidebar-link {{ request()->routeIs('pengembalian.index') ? 'active' : '' }}" href="{{ route('pengembalian.index') }}" onclick="closeMobileSidebar()">
                 <i class="fas fa-undo text-center"></i>
                 <span>Pengembalian</span>
-            </a>
-            <a class="sidebar-link {{ request()->routeIs('pengembalian.riwayat') ? 'active' : '' }}" href="{{ route('pengembalian.riwayat') }}" onclick="closeMobileSidebar()">
-                <i class="fas fa-history text-center"></i>
-                <span>Riwayat Pengembalian</span>
             </a>
         </nav>
     </div>

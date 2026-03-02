@@ -175,7 +175,7 @@ class PeminjamanController extends Controller
             'status' => 'pending_admin',
         ]);
 
-        return redirect()->route('pengembalian.riwayat')->with('success', 'Ajuan pengembalian berhasil dikirim. Menunggu konfirmasi admin.');
+        return redirect()->route('pengembalian.index')->with('success', 'Ajuan pengembalian berhasil dikirim. Menunggu konfirmasi admin.');
     }
 
     // Riwayat peminjaman (termasuk pengembalian)
@@ -238,11 +238,11 @@ class PeminjamanController extends Controller
         $pengembalian = Pengembalian::with('peminjaman')->find($id);
         
         if (!$pengembalian || !$pengembalian->peminjaman || $pengembalian->peminjaman->anggota_id != $anggota->id) {
-            return redirect()->route('pengembalian.riwayat')->with('error', 'Pengembalian tidak ditemukan atau tidak bisa diajukan ulang.');
+            return redirect()->route('pengembalian.index')->with('error', 'Pengembalian tidak ditemukan atau tidak bisa diajukan ulang.');
         }
 
         if ($pengembalian->status != 'ditolak') {
-            return redirect()->route('pengembalian.riwayat')->with('error', 'Pengembalian tidak bisa diajukan ulang (status bukan ditolak).');
+            return redirect()->route('pengembalian.index')->with('error', 'Pengembalian tidak bisa diajukan ulang (status bukan ditolak).');
         }
 
         // Update status pengembalian yang ditolak menjadi pending_admin
@@ -251,6 +251,6 @@ class PeminjamanController extends Controller
             'catatan_penolakan' => null,
         ]);
 
-        return redirect()->route('pengembalian.riwayat')->with('success', 'Pengembalian berhasil diajukan ulang! Menunggu konfirmasi admin.');
+        return redirect()->route('pengembalian.index')->with('success', 'Pengembalian berhasil diajukan ulang! Menunggu konfirmasi admin.');
     }
 }
